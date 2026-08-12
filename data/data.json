@@ -1,0 +1,588 @@
+{
+  "site": {
+    "name": "Jared Hanline",
+    "title": "Jared Hanline — Art Director & Motion Designer",
+    "role": "Art Director & Motion Designer",
+    "headline": "Creative Director Brand & Motion",
+    "tagline": "Charlotte-based creative director with nearly 20 years leading cross-discipline teams — building brands, motion systems, and the AI-era workflows that power them.",
+    "email": "jhanline@gmail.com",
+    "emailSubject": "Work Inquiry",
+    "reelVideo": "RRXaC1RTvcg",
+    "reelPoster": "assets/img/project-motionreel-tn1.webp",
+    "ctaHeading": "Let's connect and create something.",
+    "footerImage": "assets/img/jared_footer.jpg",
+    "social": [
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jared-hanline/"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/jared.hanline"
+      }
+    ]
+  },
+  "caseStudies": [
+    {
+      "slug": "clevercx-branding",
+      "title": "CleverCX Rebrand & Product Logos",
+      "client": "CleverCX",
+      "discipline": "Branding",
+      "thumb": "assets/img/project-clevercx-tn1.webp",
+      "thumbHover": "assets/img/project-clevercs-tn2.png",
+      "hero": "assets/img/project-clevercx-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "CleverCX creates financial tools that aim to level the financial market and bring financial advice to everyone. After expanding their offerings to multiple sub-brands, they wanted to update their visual identity to align better with their new goals and a demographic focused on 30–40 year old women. They wanted it to have life and energy — not the institutional, corporate ethos of other brands in the space."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "The result is a concept that synergizes the elements of lifestyle brands in the space with stability and a softness. There is energy, but it's controlled energy. When shown to the target demographic, they overwhelmingly preferred this more upbeat expression.",
+            "The process started with a few brand workshops helping to focus the target and define the brand values — a simplified brand process that paid dividends in the concept phase. There, we tried different ways to espouse the values in visuals with different priorities.",
+            "One of the tools I like to use is called a stylescape. At the beginning of a brand process, a stylescape is a prototyping tool that uses found imagery and existing design to help determine the tone and mood we're shooting for as the brand develops. As a brand takes shape, the chosen stylescape is updated with the elements of the new brand and example imagery to demonstrate the overall effect.",
+            "Below you'll find the final and near-final stylescapes for CleverCX — and as a glimpse into the branding process, the initial stylescapes provided to the client, showing how multiple directions were presented to help solidify the chosen one."
+          ]
+        }
+      ],
+      "videos": [],
+      "gallery": [
+        "assets/img/project-clevercs-gallery1.webp",
+        "assets/img/project-clevercs-gallery2.webp",
+        "assets/img/project-clevercs-gallery3.webp",
+        "assets/img/project-clevercs-gallery4.webp",
+        "assets/img/project-clevercx-stylescape-final.webp",
+        "assets/img/project-clevercx-stylescape-opt1.webp",
+        "assets/img/project-clevercx-stylescape-opt2.webp",
+        "assets/img/project-clevercx-stylescape-opt3.webp",
+        "assets/img/project-clevercx-stylescape-opt4.webp"
+      ],
+      "credits": [
+        "All Design & Direction: Jared Hanline"
+      ],
+      "section": "design"
+    },
+    {
+      "slug": "drive-in-movie-intro",
+      "title": "Drive In Movie Intro",
+      "client": "INSP",
+      "discipline": "3D & Motion Design",
+      "thumb": "assets/img/project-drivein-tn1.webp",
+      "thumbHover": "assets/img/project-drivein-tn2.webp",
+      "hero": "assets/img/project-drivein-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "INSP's programming is heavy on classic western television shows, but they also air a lot of western movies and western-adjacent content. They wanted a short intro that signaled to the viewer that something special was happening."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "With the types of movies branching out past typical cowboy westerns, we created an Americana, Route 66–inspired drive-in movie theatre set in a western landscape. It's a nod to both the typical INSP programming and the brand of nostalgia their audience enjoys. The result is a slick \"INSP Presents\" style pre-roll that tells the viewer they can settle in for a spell."
+          ]
+        }
+      ],
+      "videos": [
+        {
+          "id": "DMM_9q3zwaM",
+          "caption": "Final intro"
+        },
+        {
+          "id": "GceMzPRe0i4",
+          "caption": "Process breakdown"
+        }
+      ],
+      "gallery": [
+        "assets/img/project-drivein-gallery1.webp",
+        "assets/img/project-drivein-gallery2.webp",
+        "assets/img/project-drivein-gallery3.webp",
+        "assets/img/project-drivein-gallery4.webp",
+        "assets/img/project-drivein-gallery5.webp"
+      ],
+      "credits": [
+        "Art Direction / 3D Modeling / Animation: Jared Hanline",
+        "Sound Design: Bill Mazzola"
+      ],
+      "section": "motion"
+    },
+    {
+      "slug": "conversation-mogrt-template",
+      "title": "CleverCX Conversation Template",
+      "client": "CleverCX",
+      "discipline": "Motion Design & Scripting",
+      "thumb": "assets/img/project-mogrt-tn1.webp",
+      "thumbHover": "assets/img/project-mogrt-tn2.webp",
+      "hero": "assets/img/project-mogrt-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "Startup world can be tough — you've got to move fast and do more with less. CleverCX was launching a new feature, chatting with an advisor, which included their new AI assistant, Penny. They needed a way to show off that feature on social media, with multiple conversations and styles so they weren't just running the same ad over and over."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "The power of After Effects mogrts was leveraged to create a massive customizable template so anyone could create a conversation post for their feeds. They had control of all messaging, animation timing, multiple style and animation options, and even a few fun little controls for that something extra. The result turned what could have been a single graphic into the foundation for a broader campaign. Most importantly, the brand is built in — no matter the choices, the colors, fonts, and feel stay right in line with what CleverCX wants to be."
+          ]
+        }
+      ],
+      "videos": [],
+      "gallery": [
+        "assets/img/mesage-mogrt-1.webp",
+        "assets/img/message-mogrt.webp",
+        "assets/img/message-mogrt-3.webp",
+        "assets/img/message-mogrt-4.webp",
+        "assets/img/project-mogrt-img7.webp"
+      ],
+      "credits": [
+        "Art Direction / Motion Design / Scripting: Jared Hanline"
+      ],
+      "section": "motion"
+    },
+    {
+      "slug": "insp-network-look",
+      "title": "INSP Network Look",
+      "client": "INSP",
+      "discipline": "Broadcast Branding & Motion",
+      "thumb": "assets/img/portfolio-inspnetlook-tn1.webp",
+      "thumbHover": "assets/img/portfolio-inspnetlook-tn.webp",
+      "hero": "assets/img/portfolio-inspnetlook-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "INSP's brand is about two things — big heroes and the epic scenery of the old west. After changing their logo in 2022, they wanted to update the network look and brand to match. While the previous brand emphasized the classic nature of their programming, we wanted the new brand to be bolder, more vibrant, and a little in your face — without leaving their main demographic of 65+ behind."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "The resulting brand is a simple set of elements that puts the stars front and center, while oversized text turns the volume up a bit. Due to the nature of older acquired programming mixed with INSP originals, stills are used to bring cohesion to both. A blue and \"y-orange\" color scheme conveys the classic trust of a small-town sheriff. Texture brings a tactile roughness of the west. A leather tag serves as the frame for the logo — giving the brand a hand-tailored, man-made feel that matches the authenticity of the content."
+          ]
+        },
+        {
+          "heading": "Behind the Curtain",
+          "body": [
+            "The evolution of an idea along the journey to approval is fascinating. Not everything is in your control, even if it's your project — decision-makers and stakeholders all help shape the final network look. The images below show the various pages of pitches, ending with the pitch that gave us the look that launched on-air. Ultimately the journey could be summed up in two words: Simplify and Stars."
+          ]
+        }
+      ],
+      "videos": [
+        {
+          "id": "p3CGEsDFQr8",
+          "caption": "Network look in motion"
+        }
+      ],
+      "gallery": [
+        "assets/img/project-inspnetlook-img1.webp",
+        "assets/img/project-inspnetlook-img3.webp",
+        "assets/img/project-inspnetlook-img4.webp",
+        "assets/img/project-inspnetlook-img5.webp",
+        "assets/img/project-inspnetlook-img6.webp",
+        "assets/img/project-inspnetlook-bts1.webp",
+        "assets/img/project-inspnetlook-bts2.webp",
+        "assets/img/project-inspnetlook-bts3.webp",
+        "assets/img/project-inspnetlook-bts4.webp",
+        "assets/img/project-inspnetlook-bts5.webp",
+        "assets/img/project-inspnetlook-bts6.webp",
+        "assets/img/project-inspnetlook-bts7.webp"
+      ],
+      "credits": [
+        "Art Direction / Motion Design: Jared Hanline",
+        "Co-Art Director: Oscar Arrango",
+        "Design: Patrick McGill, Madelyn Brotherton",
+        "Motion Design: Mason Adams, Justin Warren, Tyler Outen, Kaitlyn Simpson"
+      ],
+      "section": "both"
+    },
+    {
+      "slug": "dna-culture-handbook",
+      "title": "DNA Culture Handbook",
+      "client": "Forest Hill",
+      "discipline": "Print, Illustration & Layout",
+      "thumb": "assets/img/project-dnajournal-tn1.webp",
+      "thumbHover": "assets/img/project-dnajournal-tn2.webp",
+      "hero": "assets/img/project-dnajournal-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "Growth problems are the ones people typically prefer, but as Forest Hill expanded to six locations with their own staff, unity became an issue — of thought and of culture. Leadership wanted a way for current and future hires to tap into the essence of Forest Hill's identity."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "Developing the DNA notebook, \"Our Culture\", provided a resource for all staff to consistently reference the type of organization Forest Hill wants to be. Not wanting scale to make staff feel like \"cogs in a wheel,\" leadership often used the term \"Organized Organism.\" This became the guiding philosophy of the project, shaping the content to feel like a peek into someone's sketchbook. Tons of white space and 100 blank pages at the back encouraged it to be an interactive space for notes and reflection.",
+            "The content was divided into three parts: Relational Rhythm, Intelligent Design, and Savvy Stewardship. Each part was represented by a color, and a mixture of hand-drawn illustrations and digital \"cell\" elements captures the feel of an organized organism. The result is a playful, thought-provoking journey that engages the reader far more than your typical employee handbook. Below are selected spreads from the project."
+          ]
+        }
+      ],
+      "videos": [],
+      "gallery": [
+        "assets/img/project-dnajournal-gallery1.webp",
+        "assets/img/project-dnajournal-gallery2.webp",
+        "assets/img/project-dnajournal-gallery3.webp",
+        "assets/img/project-dnajournal-gallery4.webp",
+        "assets/img/project-dnajournal-gallery5.webp",
+        "assets/img/project-dnajournal-gallery6.webp",
+        "assets/img/project-dnajournal-gallery7.webp"
+      ],
+      "credits": [
+        "Art Direction / Illustration / Layout Design: Jared Hanline",
+        "Cultural content developed by a small team that included Jared"
+      ],
+      "section": "design"
+    },
+    {
+      "slug": "bridge-groups-branding",
+      "title": "Bridge Groups Branding",
+      "client": "Forest Hill",
+      "discipline": "Branding",
+      "thumb": "assets/img/project-bridgegroup-tn1.webp",
+      "thumbHover": "assets/img/project-bridgegroup-tn2.webp",
+      "hero": "assets/img/project-bridgegroup-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "Forest Hill experienced a lot of change in the years leading up to the 2020 pandemic. Those organizational changes, along with the pandemic, left Forest Hill in need of a facelift. In rebranding their community groups — \"Bridge Groups\" — they wanted a visual identity that could signal a new day beginning.",
+            "They also wanted a brand that could reach a slightly younger demographic. We set out to create an identity that screamed life and joy. Even while some groups were meeting over video conference, we wanted to bring excitement to a group — even a Zoom one."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "A vibrant, bold redesign filled with energy and movement. The vibrancy and people-forward design brought life to digital-only meeting spaces, and the in-person elements at events announced that something new was here — and you didn't want to miss it."
+          ]
+        }
+      ],
+      "videos": [],
+      "gallery": [
+        "assets/img/project-bridgegroups-gallery1.webp",
+        "assets/img/project-bridgegroup-gallery2.webp",
+        "assets/img/project-bridgegroup-gallery4.webp",
+        "assets/img/project-bridgegroup-gallery5.webp",
+        "assets/img/project-bridgegroup-gallery6.webp",
+        "assets/img/project-bridgegroup-gallery7.webp",
+        "assets/img/project-bridgegroup-gallery8.webp",
+        "assets/img/project-bridgegroup-gallery9.webp",
+        "assets/img/project-bridgegroup-gallery10.webp",
+        "assets/img/project-bridgegroup-gallery11.png",
+        "assets/img/project-bridgegroup-gallery12.webp"
+      ],
+      "credits": [
+        "Creative / Art Direction: Jared Hanline",
+        "Graphic Design: Erin Swanson, Juan Gonzalez"
+      ],
+      "section": "design"
+    },
+    {
+      "slug": "characters-series",
+      "title": "Characters Series",
+      "client": "Forest Hill",
+      "discipline": "Graphic Design & 3D",
+      "thumb": "assets/img/project-characters-tn1.webp",
+      "thumbHover": "assets/img/project-characters-tn2.webp",
+      "hero": "assets/img/project-characters-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "Forest Hill was kicking off a long series about ancient figures, and they wanted to find a way to make those figures feel like their lessons could apply today."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "We decided to treat these characters like posters up in an urban environment. Rather than compositing in Photoshop, time was spent recreating basic scenes in Cinema 4D — giving each poster physical rips, tactile texture, and more accurate lighting. If you look closely at some images, you can see the remains of the previous week's poster, much like posters glued up in a city.",
+            "Multiple scenes were created for each poster, giving us a week's worth of social content in preparation for each weekend. While each image and poster has its own style, the in-space application brought cohesion. The series became a favorite of those who witnessed it for years to come. Below are some of the many images used in the series, as well as a couple of shots of the Cinema 4D rig for two of the scenes."
+          ]
+        }
+      ],
+      "videos": [],
+      "gallery": [
+        "assets/img/project-characters-gallery1.webp",
+        "assets/img/project-characters-gallery4.webp",
+        "assets/img/project-characters-gallery5.webp",
+        "assets/img/project-characters-gallery6.webp",
+        "assets/img/project-characters-gallery7.webp",
+        "assets/img/project-characters-gallery8.webp",
+        "assets/img/project-characters-gallery9.webp",
+        "assets/img/project-characters-gallery10.webp",
+        "assets/img/project-characters-gallery11.webp",
+        "assets/img/project-characters-gallery12.webp",
+        "assets/img/project-characters-gallery13.webp",
+        "assets/img/project-characters-gallery14.webp"
+      ],
+      "credits": [
+        "Art Direction / Graphic Design: Jared Hanline",
+        "Additional Poster Design: Leah Haines, Erin Swanson, Carl Etzel"
+      ],
+      "section": "design"
+    },
+    {
+      "slug": "viral-christmas-video",
+      "title": "Viral Christmas Video",
+      "client": "Forest Hill",
+      "discipline": "Video & Creative Direction",
+      "thumb": "assets/img/project-viralvideo-tn1.webp",
+      "thumbHover": "assets/img/project-viralvideo-tn2.webp",
+      "hero": "assets/img/project-viralvideo-hero.webp",
+      "sections": [
+        {
+          "heading": "The Ask",
+          "body": [
+            "Forest Hill was looking to make video content to bring joy and help reframe the Christmas season — a low-pressure invite and social media share for their members to use for Christmas Eve."
+          ]
+        },
+        {
+          "heading": "The Result",
+          "body": [
+            "The resulting narrative was \"Christmas Presents\", a video that very vividly reminds you that everything in life is a gift. Having both humor and heart, Matt Nunn plays the lead role of a father unwrapping his life. Serendipitously, perhaps, a different actor was originally scheduled to play the part and cancelled the morning of the shoot — the director had to hand the camera over and use his acting chops.",
+            "Over the initial Christmas season, the video was viewed over 20 million times in over 50 countries, with countless requests from businesses and organizations to show it. Each year, the video would re-emerge on social media and go for another round. In 2019, the last count across all channels was over 100 million views. The video was so successful it was written about in the Charlotte Observer — one year after it originally aired."
+          ]
+        }
+      ],
+      "videos": [
+        {
+          "id": "gi_tedIr_-g",
+          "caption": "Christmas Presents"
+        }
+      ],
+      "gallery": [],
+      "credits": [
+        "Producer / Creative Director: Jared Hanline",
+        "Producer: Andrew Weiler",
+        "Director / Lead Actor: Matt Nunn",
+        "Cinematographer: Will Morris"
+      ],
+      "section": "design",
+      "hidden": true
+    }
+  ],
+  "archive": [
+    {
+      "title": "Outpost Strategies Logo",
+      "thumb": "assets/img/archive-outpost-tn.webp",
+      "images": [
+        "assets/img/archive-outpost-img1.webp",
+        "assets/img/archive-outpost-img2.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "INSP New Year ID",
+      "thumb": "assets/img/archive-newyear-tn.webp",
+      "video": "13_uPDVKRFY",
+      "section": "motion"
+    },
+    {
+      "title": "A.W. Interiors Logo",
+      "thumb": "assets/img/archive-aw-tn.webp",
+      "images": [
+        "assets/img/archive-aw-img1.webp",
+        "assets/img/archive-aw-img2.webp",
+        "assets/img/archive-aw-img3.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "INSP Curtain Raiser",
+      "thumb": "assets/img/archive-inspcurtain-tn.webp",
+      "video": "pLs8DK_q5p0",
+      "section": "motion"
+    },
+    {
+      "title": "Twelve Logo",
+      "thumb": "assets/img/archive-xii-tn.webp",
+      "images": [
+        "assets/img/archive-xii-img1.webp",
+        "assets/img/archive-xii-img2.webp",
+        "assets/img/archive-xii-img3.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "Walk By Faith Intro",
+      "thumb": "assets/img/archive-wbf-tn.webp",
+      "video": "GzrJ9cfyY1c",
+      "section": "motion"
+    },
+    {
+      "title": "18X Consulting Logo Package",
+      "thumb": "assets/img/archive-18x-tn.webp",
+      "images": [
+        "assets/img/archive-18x-img1.webp",
+        "assets/img/archive-18x-img2.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "On Trajectory Illustrations & Loaders",
+      "thumb": "assets/img/animated.webp",
+      "images": [
+        "assets/img/animated.webp",
+        "assets/img/generic-ot-loader.webp",
+        "assets/img/hidden-chevron.webp",
+        "assets/img/archive-ontrajectory-illustration.webp"
+      ],
+      "section": "both"
+    },
+    {
+      "title": "Pick It Up Put It Down",
+      "thumb": "assets/img/archive-pickupputdown-tn.webp",
+      "video": "xYtK2F8qs7I",
+      "section": "motion"
+    },
+    {
+      "title": "Shadow Creek Apiary Brand",
+      "thumb": "assets/img/archive-shadow-tn.webp",
+      "images": [
+        "assets/img/archive-shadow-img1.webp",
+        "assets/img/archive-shadow-img2.webp",
+        "assets/img/archive-shadow-img3.webp",
+        "assets/img/archive-shadow-img4.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "INSP Halloween ID",
+      "thumb": "assets/img/archive-halloween-tn.webp",
+      "video": "BM6pQnhISJU",
+      "section": "motion"
+    },
+    {
+      "title": "Immanuel Church Logo",
+      "thumb": "assets/img/archive-ic-tn.webp",
+      "images": [
+        "assets/img/archive-ic-img1.webp",
+        "assets/img/archive-ic-img2.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "Matchstick Creative Logo",
+      "thumb": "assets/img/archive-matchstick-tn.webp",
+      "images": [
+        "assets/img/archive-matchstick-img2.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "Genmill Logo Suite",
+      "thumb": "assets/img/archive-genmill-tn.webp",
+      "images": [
+        "assets/img/archive-genmill-img2.webp",
+        "assets/img/archive-genmill-img3.webp"
+      ],
+      "section": "design"
+    },
+    {
+      "title": "Endure Short Film",
+      "thumb": "assets/img/endure-tn.webp",
+      "video": "cBX2HGaPS3M",
+      "section": "motion",
+      "hidden": true
+    },
+    {
+      "title": "Animated Easter Intro",
+      "thumb": "assets/img/animatedintro-tn.webp",
+      "video": "tyHzKijM4V8",
+      "section": "motion"
+    },
+    {
+      "title": "Blue Session Intros",
+      "thumb": "assets/img/archive-blue-sessionintro.webp",
+      "video": "fqblVjXcHqU",
+      "section": "motion"
+    }
+  ],
+  "about": {
+    "portrait": "assets/img/jared-portrait.webp",
+    "intro": "I'm a Creative Director with nearly 20 years of experience turning complex business goals into visual stories that actually land. I've built and led high-performing creative teams delivering brand systems, motion graphics, and video across diverse markets. My approach combines data-driven strategy with a maker's mentality — staying hands-on while building the systems and smart tools that let creative teams scale.",
+    "disciplines": []
+  },
+  "sections": {
+    "motion": {
+      "label": "Motion Design",
+      "desc": "2D / 3D / Broadcast / Animation",
+      "heading": "Brands that | Don't *Sit Still*",
+      "blurb": "Neither do I.",
+      "archiveEnabled": true
+    },
+    "design": {
+      "label": "Branding & Graphic Design",
+      "desc": "Brand Strategy / Visual Identities / Logos / Illustration / Layout",
+      "heading": "Generic |is a *Choice*",
+      "blurb": "Let's make a better one.",
+      "archiveEnabled": true
+    },
+    "testbench": {
+      "label": "Test Bench",
+      "desc": "After Effects Extensions / Software Experiments",
+      "heading": "Tinker 'til |it *Works*",
+      "blurb": "Or at least breaks a little less."
+    }
+  },
+  "testbench": {
+    "enabled": true,
+    "items": [
+      {
+        "name": "Snipe Hunter",
+        "blurb": "Data merge for After Effects. Version out using spreadsheet data to replace images/videos, text, colors, or anything you can imagine.\n\nSave config files and use in Snipe Buddy, a companion app that let's anyone with an Excel file create the versions they need with a click of a button.",
+        "images": [
+          "assets/img/testbench-snipehunter1.png",
+          "assets/img/testbench-snipehunter2.png"
+        ],
+        "link": {
+          "type": "web",
+          "url": ""
+        }
+      },
+      {
+        "name": "Phosphor",
+        "blurb": "An expression editing IDE. A much larger interface for writing expressions that includes IDE coloring and an expression library for you to save and re-use your favorites. Create an easy expression that allows you to edit placeholders more quickly then scrolling through your entire script and highlighting and retyping values.",
+        "images": [
+          "assets/img/testbench-phosphor1.png"
+        ],
+        "link": {
+          "type": "web",
+          "url": ""
+        }
+      },
+      {
+        "name": "Striker",
+        "blurb": "Batch Mogrt exports so you don't have to wait. No endless modals to approve, just select the ones you want and export. Grab a cup of coffee and come back to your pile of Mogrts. Re-import mogrts into your current AE project, and preview animated thumbnails of mogrts you've exported. Honestly, all the mogrt features that After Effects should ship natively.",
+        "images": [
+          "assets/img/testbench-striker1.png",
+          "assets/img/testbench-striker2.png",
+          "assets/img/testbench-striker3.png"
+        ],
+        "link": {
+          "type": "web",
+          "url": ""
+        }
+      },
+      {
+        "name": "Spark",
+        "blurb": "A YouTube Player panel for After Effects. Follow along with tutorials, adding notes and bookmarks that you can reference anytime. Save your favorite methods to reference with ease, or put on your favorite content creator as background noise as you get in the flow state.",
+        "images": [
+          "assets/img/testbench-spark1.png",
+          "assets/img/testbench-spark2.png",
+          "assets/img/testbench-spark3.png"
+        ],
+        "link": {
+          "type": "web",
+          "url": ""
+        }
+      }
+    ]
+  }
+}
