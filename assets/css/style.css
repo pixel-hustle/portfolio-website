@@ -109,7 +109,7 @@ a { color: inherit; text-decoration: none; }
   text-transform: uppercase;
   font-size: 1.05rem;
   letter-spacing: 0.04em;
-  line-height: 1.05; /* tight lockup leading if the name stacks */
+  line-height: 0.95; /* tight lockup leading if the name stacks */
 }
 
 .wordmark span { color: var(--accent); }

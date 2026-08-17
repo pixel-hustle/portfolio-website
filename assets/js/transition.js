@@ -27,7 +27,7 @@
     "#pt .wm{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);" +
     "font-family:'Anton','Arial Narrow',sans-serif;font-weight:400;" +
     "text-transform:uppercase;letter-spacing:.04em;font-size:clamp(2rem,6vw,3.5rem);" +
-    "line-height:1.05;" + // tight lockup leading when the name stacks
+    "line-height:.95;" + // tight lockup leading when the name stacks
     "color:var(--bg,#f4f1ea);opacity:0;transition:opacity .18s ease}" +
     "#pt .wm em{font-style:normal;color:var(--accent,#d8480b)}" +
     "#pt.covered .wm,#pt.cover .wm{opacity:1;transition:opacity .2s ease .25s}";
