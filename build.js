@@ -181,8 +181,8 @@ function archiveTeaser(key) {
 
 function buildLanding() {
   const rows = [
-    { href: "motion.html", label: sections.motion.label, desc: sections.motion.desc },
     { href: "design.html", label: sections.design.label, desc: sections.design.desc },
+    { href: "motion.html", label: sections.motion.label, desc: sections.motion.desc },
   ];
   if (testbench.enabled) {
     rows.push({
