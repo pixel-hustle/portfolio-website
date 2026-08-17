@@ -206,14 +206,16 @@ function buildLanding() {
   return `${head(site.title, site.tagline, site.reelPoster)}
 ${nav("home")}
 <main>
-  <section class="land-masthead wrap">
-    <h1 class="display">${accent(site.headline || site.role)}</h1>
-    <p>${esc(site.tagline)}</p>
-  </section>
+  <div class="land-hero">
+    <section class="land-masthead wrap">
+      <h1 class="display">${accent(site.headline || site.role)}</h1>
+      <p>${esc(site.tagline)}</p>
+    </section>
 
-  <nav class="land-rows wrap" aria-label="Sections">
+    <nav class="land-rows wrap" aria-label="Sections">
 ${rowsHtml}
-  </nav>
+    </nav>
+  </div>
 
   <section class="section wrap" id="about">
     <div class="section-head">
