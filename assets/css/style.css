@@ -807,12 +807,6 @@ dialog.lightbox::backdrop {
 
 .land-masthead h1 em { font-style: normal; color: var(--accent); }
 
-.land-masthead p {
-  max-width: 40ch;
-  color: var(--muted);
-  font-size: 0.98rem;
-}
-
 .land-rows { border-top: 1px solid var(--ink); display: block; }
 
 .land-row {
@@ -904,13 +898,6 @@ dialog.lightbox::backdrop {
     flex: 1 0 auto;
     align-content: center;
   }
-}
-
-/* the masthead blurb sits beside the headline on desktop, so it costs no
-   height there. Stacked on narrow screens it costs ~115px — more than a whole
-   row — and the About lede below says the same thing at length. */
-@media (max-width: 760px) {
-  .land-masthead p { display: none; }
 }
 
 .about-actions { margin-top: 0; }

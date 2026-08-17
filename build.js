@@ -209,7 +209,6 @@ ${nav("home")}
   <div class="land-hero">
     <section class="land-masthead wrap">
       <h1 class="display">${accent(site.headline || site.role)}</h1>
-      <p>${esc(site.tagline)}</p>
     </section>
 
     <nav class="land-rows wrap" aria-label="Sections">
