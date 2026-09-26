@@ -32,26 +32,39 @@ edit the About page. When you hit save, it rebuilds the website files.
 
 ## Using it
 
-There are four tabs:
+There are five tabs:
 
-- **Case Studies** — one unified list of all projects.
-  - ↑ / ↓ reorder them (order here = order on the site)
-  - **Hide** takes a project off the site without deleting it — it stays
+- **Case Studies**: one list of every project.
+  - ↑ / ↓ reorder them (order here = order on the Work page)
+  - **Hide** takes a project off the site without deleting it. It stays
     in this list, grayed out, until you click **Show**
-  - **Edit** opens everything: title, **Section** (Motion, Design, or
-    **Both pages**), client, discipline, thumbnails, hero image, the
-    text sections, YouTube videos, gallery images, credits
+  - **Edit** opens everything: title, **Filters** (tick every filter the
+    project belongs under; it always shows under "All"), client, discipline,
+    thumbnails, hero image, the **Page layout**, and credits
+  - **Page layout** is everything under the hero image, top to bottom:
+    text sections, images, and YouTube videos in any order. Drag the ⋮⋮
+    handle (or use ↑ ↓) to move a block. "+ Images…" lets you click several
+    images at once (they're added in the order you click them). New blocks
+    land at the bottom, so drag them where you want them. Credits always
+    close the page.
   - **+ Add project** creates a new one; **Delete** removes one for good
   - Inside **Edit**, "Send to Archives →" demotes a project to an archive
     piece. Its full write-up is kept invisibly, so promoting it back
     later restores everything.
-- **Archives** — one unified list of the smaller pieces. Same idea:
-  a **Which archive** picker (Motion, Design, or Both), a **Hide/Show**
-  toggle, a thumbnail, and either a YouTube video ID or a set of images
-  for the pop-up viewer. Inside **Edit**, "Promote to Case Study →"
-  turns a piece into a full case study — instantly restoring the old
-  write-up if it used to be one, or giving you a blank story to fill in
-  if it didn't.
+- **Archives**: one list of the smaller pieces. Same idea: **Filters**
+  checkboxes, a **Hide/Show** toggle, a thumbnail, and either a YouTube video
+  ID or a set of images for the pop-up viewer. Inside **Edit**, "Promote to
+  Case Study →" turns a piece into a full case study. If it used to be one,
+  that instantly restores the old write-up; if not, you get a blank story
+  to fill in.
+- **Work Page & Filters**: the filter buttons shown on the Work and Archive
+  pages (after "All", which is always there). Add, rename, reorder, or delete
+  filters here. Each filter can have its own big header and blurb (shown while
+  it's selected) and can show the **motion reel** at the top. Deleting a filter just
+  removes that tag from projects; nothing else is lost. This tab also holds
+  the Work page's name ("My Work", used in the nav and as the landing page
+  row), its header, landing descriptor, whether the reel shows in the "All"
+  view, the Archive on/off switch, and the reel video.
 - **Test Bench** — your tools and software experiments, with an ON/OFF
   switch for the whole section. Each tool has a name, blurb, a list of
   screenshots, and an optional link (a Download link shows a "Get This"
@@ -60,12 +73,10 @@ There are four tabs:
   under it. Reorder with ↑ ↓ — whatever sits at the top is the main image.
   Every screenshot opens in a lightbox, with arrow keys to step through
   them. Tools with no link show no button at all. The page's big header,
-  blurb, page name, and landing descriptor are edited in **About & Site**,
-  alongside the Motion and Design pages.
-- **About & Site** — the landing page headline and tagline, your email,
-  motion reel video, the About intro and portrait (shown on the landing
-  page), ON/OFF switches for both archives, and each section page's
-  text: big header, blurb, page name, and landing descriptor. In headers,
+  blurb, page name, and landing descriptor are edited in **About & Site**.
+- **About & Site**: the landing page headline and tagline, your email,
+  the About intro and portrait (shown on the landing page), and the Test
+  Bench page's text. In headers,
   "&" and anything wrapped in *asterisks* renders in the accent color,
   and a "|" forces a line break.
 
@@ -76,6 +87,8 @@ Tips:
 - YouTube video ID = the part after `watch?v=` in a YouTube link.
   For `youtube.com/watch?v=RRXaC1RTvcg` the ID is `RRXaC1RTvcg`.
 - In text sections, separate paragraphs with a blank line.
+- Link straight to a filter with `work.html?filter=motion` (the "URL name"
+  shown in the Work Page & Filters tab).
 
 ## Saving
 

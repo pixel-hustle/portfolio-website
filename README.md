@@ -14,10 +14,12 @@ assets/img/        ← every image on the site
 assets/css/style.css
 assets/js/site.js
 index.html         ← landing: big section nav + about   (generated, don't edit by hand)
-motion.html, design.html          ← the two work sections (generated)
+work.html                         ← every case study, with filter buttons (generated)
 testbench.html                    ← tools & experiments, toggleable (generated)
-archive-motion.html, archive-design.html   ← per-section archives, toggleable (generated)
+archive.html                      ← smaller pieces, same filters, toggleable (generated)
 project-*.html                    ← case study pages (generated)
+motion.html, design.html, archive-motion.html, archive-design.html
+                                  ← redirects so old links land on the matching filter
 ```
 
 ## Editing content (the CMS)

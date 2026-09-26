@@ -6,10 +6,12 @@
  *
  * Outputs (repo root):
  *   index.html                      landing (big section nav + about)
- *   motion.html / design.html       the two work sections
+ *   work.html                       all case studies, filterable by tag
  *   testbench.html                  tools & software experiments (toggleable)
- *   archive-motion.html / -design.html   per-section archives (toggleable)
+ *   archive.html                    smaller pieces, same filters (toggleable)
  *   project-<slug>.html             one per case study
+ *   motion.html, design.html,       redirects for old links → the matching
+ *   archive-motion/-design.html     filter on work.html / archive.html
  *
  * No dependencies — plain Node.
  */
@@ -21,6 +23,9 @@ const ROOT = __dirname;
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "data.json"), "utf8"));
 const { site, caseStudies, archive, about } = data;
 const sections = data.sections;
+const work = sections.work;
+// the filter buttons on the Work + Archive pages; items opt in via their `tags`
+const filters = data.filters || [];
 const testbench = data.testbench || { enabled: false, items: [] };
 // older data files predate the editable Test Bench page text
 if (!sections.testbench)
@@ -56,15 +61,14 @@ const ytThumb = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 const playIcon = `<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`;
 
-const inSection = (item, key) => {
-  const s = item.section || "design";
-  return !item.hidden && (s === key || s === "both");
-};
-const bySection = (key) => caseStudies.filter((p) => inSection(p, key));
-const archiveBySection = (key) => archive.filter((a) => inSection(a, key));
-// a "both" project needs one home for its back-link and prev/next chain
-const primarySection = (p) =>
-  p.section === "motion" || p.section === "both" ? "motion" : "design";
+const tagsOf = (item) => (item.tags || []).filter((t) => filters.some((f) => f.key === t));
+const liveCases = caseStudies.filter((p) => !p.hidden);
+const liveArchive = archive.filter((a) => !a.hidden);
+const workHref = (key) => (key ? `work.html?filter=${encodeURIComponent(key)}` : "work.html");
+const hasFilter = (key) => filters.some((f) => f.key === key);
+
+// safe to drop inside <script type="application/json">
+const jsonScript = (obj) => JSON.stringify(obj).replace(/</g, "\\u003c");
 
 function videoFacade(id, label, poster) {
   return `<div class="video-embed">
@@ -107,8 +111,7 @@ function nav(active) {
       ? ""
       : `
     <nav class="site-nav" aria-label="Main">
-      ${link("motion.html", "Motion", "motion")}
-      ${link("design.html", "Design", "design")}
+      ${link("work.html", esc(work.label), "work")}
       ${testbench.enabled ? link("testbench.html", esc(sections.testbench.label), "testbench") : ""}
     </nav>`;
   return `<header class="site-header">
@@ -148,7 +151,7 @@ function footer() {
 function workGrid(list) {
   return list
     .map(
-      (p, i) => `<article class="work-card">
+      (p, i) => `<article class="work-card" data-tags="${esc(tagsOf(p).join(" "))}">
   <a href="project-${esc(p.slug)}.html">
     <figure>
       <img src="${esc(p.thumb)}" alt="${esc(p.title)}" loading="${i < 2 ? "eager" : "lazy"}">
@@ -166,24 +169,37 @@ function workGrid(list) {
     .join("\n");
 }
 
-function archiveTeaser(key) {
-  const items = archiveBySection(key);
-  return `<div class="archive-teaser">
-      <a href="archive-${key}.html">
+// per-filter counts let site.js keep the teaser honest as filters change
+function archiveTeaser() {
+  const counts = { all: liveArchive.length };
+  filters.forEach((f) => (counts[f.key] = liveArchive.filter((a) => tagsOf(a).includes(f.key)).length));
+  return `<div class="archive-teaser" data-archive-teaser="${esc(JSON.stringify(counts))}">
+      <a href="archive.html">
         <span class="display">The Archive</span>
-        <span class="mono">${items.length} more pieces beyond the case studies</span>
+        <span class="mono"><span data-archive-count>${liveArchive.length}</span> more pieces beyond the case studies</span>
         <span class="arrow" aria-hidden="true">&rarr;</span>
       </a>
     </div>`;
 }
 
+// "All" plus one button per filter that has something in it. Without JS
+// every item simply stays visible.
+function filterBar(list, label) {
+  const count = (key) => list.filter((x) => tagsOf(x).includes(key)).length;
+  const btn = (key, name, n) =>
+    `<button type="button" class="filter-btn" data-filter="${esc(key)}" aria-pressed="${key === "all"}">${esc(name)}<span class="count">${pad(n)}</span></button>`;
+  const buttons = filters.filter((f) => count(f.key)).map((f) => btn(f.key, f.label, count(f.key)));
+  if (!buttons.length) return "";
+  return `<div class="filter-bar" role="group" aria-label="${esc(label)}">
+    ${btn("all", "All", list.length)}
+    ${buttons.join("\n    ")}
+  </div>`;
+}
+
 // ---------- landing ----------
 
 function buildLanding() {
-  const rows = [
-    { href: "design.html", label: sections.design.label, desc: sections.design.desc },
-    { href: "motion.html", label: sections.motion.label, desc: sections.motion.desc },
-  ];
+  const rows = [{ href: "work.html", label: work.label, desc: work.desc || "" }];
   if (testbench.enabled) {
     rows.push({
       href: "testbench.html",
@@ -235,64 +251,79 @@ ${rowsHtml}
 ${footer()}`;
 }
 
-// ---------- section pages ----------
+// ---------- work page ----------
 
-function buildMotion() {
-  const list = bySection("motion");
-  return `${head(`${sections.motion.label} — ${site.name}`, `Motion design work by ${site.name}: ${sections.motion.desc}`, site.reelPoster)}
-${nav("motion")}
-<main>
+function buildWork() {
+  const list = liveCases;
+
+  // each filter can bring its own header text (and the reel); blank falls
+  // back to the Work page's own header
+  const views = {
+    all: { kicker: esc(work.label), heading: accent(work.heading || work.label), blurb: esc(work.blurb || ""), reel: !!work.showReel },
+  };
+  filters.forEach((f) => {
+    views[f.key] = f.heading
+      ? { kicker: esc(f.label), heading: accent(f.heading), blurb: esc(f.blurb || ""), reel: !!f.showReel }
+      : { ...views.all, kicker: esc(f.label), reel: !!f.showReel };
+  });
+  const reel = site.reelVideo && (work.showReel || filters.some((f) => f.showReel));
+
+  return `${head(`${work.label} — ${site.name}`, `Branding, design, and motion work by ${site.name}.`, site.reelPoster)}
+${nav("work")}
+<main data-filter-scope>
+  <script type="application/json" data-filter-views>${jsonScript(views)}</script>
   <header class="page-head wrap">
-    <p class="kicker mono">${esc(sections.motion.label)}</p>
-    <h1 class="display">${accent(sections.motion.heading || sections.motion.label)}</h1>
-    <p class="blurb">${esc(sections.motion.blurb || "")}</p>
+    <p class="kicker mono">${views.all.kicker}</p>
+    <h1 class="display">${views.all.heading}</h1>
+    <p class="blurb">${views.all.blurb}</p>
   </header>
 
-  <section class="section wrap" id="reel">
+  <div class="wrap filter-row">
+  ${filterBar(list, "Filter case studies")}
+  </div>
+${
+  reel
+    ? `
+  <section class="section wrap" id="reel" data-reel${work.showReel ? "" : " hidden"}>
     <div class="section-head">
       <h2>Motion Reel</h2>
       <span class="mono">The star of the show</span>
     </div>
     ${videoFacade(site.reelVideo, "Motion reel", site.reelPoster)}
   </section>
-
+`
+    : ""
+}
   <section class="section wrap" id="work">
     <div class="section-head">
       <h2>Case Studies</h2>
-      <span class="mono">${pad(list.length)}</span>
+      <span class="mono" data-filter-count>${pad(list.length)}</span>
     </div>
     <div class="work-grid">
 ${workGrid(list)}
     </div>
-    ${sections.motion.archiveEnabled ? archiveTeaser("motion") : ""}
+    <p class="filter-empty" hidden>Nothing here yet &mdash; check back soon.</p>
+    ${work.archiveEnabled ? archiveTeaser() : ""}
   </section>
 </main>
 ${footer()}`;
 }
 
-function buildDesign() {
-  const list = bySection("design");
-  return `${head(`${sections.design.label} — ${site.name}`, `Design and branding work by ${site.name}: ${sections.design.desc}`)}
-${nav("design")}
-<main>
-  <header class="page-head wrap">
-    <p class="kicker mono">${esc(sections.design.label)}</p>
-    <h1 class="display">${accent(sections.design.heading || sections.design.label)}</h1>
-    <p class="blurb">${esc(sections.design.blurb || "")}</p>
-  </header>
-
-  <section class="section wrap" id="work">
-    <div class="section-head">
-      <h2>Case Studies</h2>
-      <span class="mono">${pad(list.length)}</span>
-    </div>
-    <div class="work-grid">
-${workGrid(list)}
-    </div>
-    ${sections.design.archiveEnabled ? archiveTeaser("design") : ""}
-  </section>
-</main>
-${footer()}`;
+// old section URLs stay alive as redirects to the matching filter
+function redirectPage(to) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Redirecting…</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="${esc(to)}">
+<meta http-equiv="refresh" content="0; url=${esc(to)}">
+<script>location.replace(${JSON.stringify(to)} + location.hash)</script>
+</head>
+<body><a href="${esc(to)}">Continue</a></body>
+</html>
+`;
 }
 
 // ---------- test bench ----------
@@ -376,44 +407,47 @@ ${footer()}`;
 
 // ---------- project pages ----------
 
-function buildProject(p) {
-  const home = primarySection(p);
-  const siblings = bySection(home);
-  const i = siblings.findIndex((x) => x.slug === p.slug);
-  const prev = siblings[(i - 1 + siblings.length) % siblings.length] || p;
-  const next = siblings[(i + 1) % siblings.length] || p;
-  const backHref = `${home}.html#work`;
-
-  const sectionsHtml = (p.sections || [])
-    .map(
-      (s) => `<section class="project-section">
-  <h2>${esc(s.heading)}</h2>
+// consecutive image/video blocks share one media stack; a text block ends it
+function projectBlocks(p) {
+  const out = [];
+  let media = [];
+  const flush = () => {
+    if (media.length) out.push(`  <div class="project-media">\n${media.join("\n")}\n  </div>`);
+    media = [];
+  };
+  for (const b of p.blocks || []) {
+    const caption = b.caption ? `\n  <figcaption class="media-caption">${esc(b.caption)}</figcaption>` : "";
+    if (b.type === "text") {
+      flush();
+      out.push(`<section class="project-section">
+  <h2>${esc(b.heading)}</h2>
   <div class="body">
-    ${s.body.map((par) => `<p>${esc(par)}</p>`).join("\n    ")}
+    ${(b.body || []).map((par) => `<p>${esc(par)}</p>`).join("\n    ")}
   </div>
-</section>`
-    )
-    .join("\n");
+</section>`);
+    } else if (b.type === "image" && b.src) {
+      media.push(`<figure><img src="${esc(b.src)}" alt="${esc(b.caption || p.title)}" loading="lazy">${caption}</figure>`);
+    } else if (b.type === "video" && b.id) {
+      media.push(`<figure>
+  ${videoFacade(b.id, b.caption || p.title)}${caption}
+</figure>`);
+    }
+  }
+  flush();
+  return out.join("\n");
+}
 
-  const videos = (p.videos || [])
-    .map(
-      (v) => `<figure>
-  ${videoFacade(v.id, v.caption || p.title)}
-  ${v.caption ? `<figcaption class="media-caption">${esc(v.caption)}</figcaption>` : ""}
-</figure>`
-    )
-    .join("\n");
-
-  const gallery = (p.gallery || [])
-    .map((src) => `<figure><img src="${esc(src)}" alt="${esc(p.title)}" loading="lazy"></figure>`)
-    .join("\n");
+function buildProject(p) {
+  const i = liveCases.findIndex((x) => x.slug === p.slug);
+  const prev = liveCases[(i - 1 + liveCases.length) % liveCases.length] || p;
+  const next = liveCases[(i + 1) % liveCases.length] || p;
 
   const credits = (p.credits || []).map((c) => `<li>${esc(c)}</li>`).join("\n      ");
 
   return `${head(`${p.title} — ${site.name}`, `${p.title} · ${p.client} · ${p.discipline}`, p.hero)}
-${nav(home)}
+${nav("work")}
 <main class="wrap">
-  <a class="back-link mono" href="${backHref}">&larr; ${esc(sections[home].label)}</a>
+  <a class="back-link mono" href="work.html#work" data-back-work>&larr; ${esc(work.label)}</a>
   <header class="project-head">
     <h1 class="display">${esc(p.title)}</h1>
     <dl class="project-meta">
@@ -425,9 +459,7 @@ ${nav(home)}
 
   ${p.hero ? `<figure class="project-hero"><img src="${esc(p.hero)}" alt="${esc(p.title)}"></figure>` : ""}
 
-${sectionsHtml}
-
-  ${videos || gallery ? `<div class="project-media">\n${videos}\n${gallery}\n  </div>` : ""}
+${projectBlocks(p)}
 
   <section class="project-credits">
     <h2>Credits</h2>
@@ -452,13 +484,12 @@ ${footer()}`;
 
 // ---------- archives ----------
 
-function buildArchive(key) {
-  const items = archiveBySection(key);
-  const cards = items
+function buildArchive() {
+  const cards = liveArchive
     .map((item) => {
       const payload = esc(JSON.stringify({ title: item.title, video: item.video, images: item.images }));
       const kind = item.video ? "Video" : "Stills";
-      return `<button class="archive-card" type="button" data-item="${payload}">
+      return `<button class="archive-card" type="button" data-item="${payload}" data-tags="${esc(tagsOf(item).join(" "))}">
   <figure><img src="${esc(item.thumb)}" alt="${esc(item.title)}" loading="lazy"></figure>
   <h3>${esc(item.title)}</h3>
   <p class="meta">${kind}</p>
@@ -466,19 +497,19 @@ function buildArchive(key) {
     })
     .join("\n");
 
-  const label = sections[key].label;
-
-  return `${head(`${label} Archive — ${site.name}`, `More ${label.toLowerCase()} work by ${site.name}.`)}
-${nav(key)}
-<main class="wrap">
-  <a class="back-link mono" href="${key}.html#work">&larr; ${esc(label)}</a>
+  return `${head(`Archive — ${site.name}`, `More branding, design, and motion work by ${site.name}.`)}
+${nav("work")}
+<main class="wrap" data-filter-scope>
+  <a class="back-link mono" href="work.html#work" data-back-work>&larr; ${esc(work.label)}</a>
   <header class="page-head">
     <h1 class="display">The Archive</h1>
-    <p class="lede">Smaller ${key === "motion" ? "motion pieces, IDs, and intros" : "logos, identities, and illustration work"} that didn't need a full case study. Click any piece to view it.</p>
+    <p class="lede">Smaller pieces &mdash; logos, identities, IDs, and intros &mdash; that didn't need a full case study. Click any piece to view it.</p>
   </header>
+  ${filterBar(liveArchive, "Filter archive")}
   <div class="archive-grid">
 ${cards}
   </div>
+  <p class="filter-empty" hidden>Nothing here yet &mdash; check back soon.</p>
 </main>
 
 <dialog class="lightbox" id="lightbox">
@@ -502,14 +533,20 @@ function write(name, html) {
 
 console.log("Building site from data/data.json ...");
 
-const expected = new Set(["index.html", "motion.html", "design.html"]);
+const legacy = {
+  "motion.html": workHref(hasFilter("motion") && "motion"),
+  "design.html": workHref(hasFilter("design") && "design"),
+  "archive-motion.html": work.archiveEnabled ? `archive.html${hasFilter("motion") ? "?filter=motion" : ""}` : "work.html",
+  "archive-design.html": work.archiveEnabled ? `archive.html${hasFilter("design") ? "?filter=design" : ""}` : "work.html",
+};
+
+const expected = new Set(["index.html", "work.html", ...Object.keys(legacy)]);
 if (testbench.enabled) expected.add("testbench.html");
-if (sections.motion.archiveEnabled) expected.add("archive-motion.html");
-if (sections.design.archiveEnabled) expected.add("archive-design.html");
-caseStudies.filter((p) => !p.hidden).forEach((p) => expected.add(`project-${p.slug}.html`));
+if (work.archiveEnabled) expected.add("archive.html");
+liveCases.forEach((p) => expected.add(`project-${p.slug}.html`));
 
 // remove generated pages that shouldn't exist anymore
-const generated = /^(project-.*|about|archive|archive-motion|archive-design|motion|design|testbench)\.html$/;
+const generated = /^(project-.*|about|archive|archive-motion|archive-design|motion|design|work|testbench)\.html$/;
 for (const f of fs.readdirSync(ROOT)) {
   if (generated.test(f) && !expected.has(f)) {
     fs.unlinkSync(path.join(ROOT, f));
@@ -518,11 +555,10 @@ for (const f of fs.readdirSync(ROOT)) {
 }
 
 write("index.html", buildLanding());
-write("motion.html", buildMotion());
-write("design.html", buildDesign());
+write("work.html", buildWork());
 if (testbench.enabled) write("testbench.html", buildTestbench());
-caseStudies.filter((p) => !p.hidden).forEach((p) => write(`project-${p.slug}.html`, buildProject(p)));
-if (sections.motion.archiveEnabled) write("archive-motion.html", buildArchive("motion"));
-if (sections.design.archiveEnabled) write("archive-design.html", buildArchive("design"));
+liveCases.forEach((p) => write(`project-${p.slug}.html`, buildProject(p)));
+if (work.archiveEnabled) write("archive.html", buildArchive());
+for (const [name, to] of Object.entries(legacy)) write(name, redirectPage(to));
 
 console.log("Done.");
