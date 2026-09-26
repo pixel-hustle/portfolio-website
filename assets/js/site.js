@@ -58,7 +58,6 @@ document.querySelectorAll("[data-filter-scope]").forEach((scope) => {
 
     const view = views && (views[key] || views.all);
     if (view && head) {
-      head.querySelector(".kicker").innerHTML = view.kicker;
       head.querySelector("h1").innerHTML = view.heading;
       head.querySelector(".blurb").innerHTML = view.blurb;
     }

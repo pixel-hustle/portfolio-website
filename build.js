@@ -259,12 +259,12 @@ function buildWork() {
   // each filter can bring its own header text (and the reel); blank falls
   // back to the Work page's own header
   const views = {
-    all: { kicker: esc(work.label), heading: accent(work.heading || work.label), blurb: esc(work.blurb || ""), reel: !!work.showReel },
+    all: { heading: accent(work.heading || work.label), blurb: esc(work.blurb || ""), reel: !!work.showReel },
   };
   filters.forEach((f) => {
     views[f.key] = f.heading
-      ? { kicker: esc(f.label), heading: accent(f.heading), blurb: esc(f.blurb || ""), reel: !!f.showReel }
-      : { ...views.all, kicker: esc(f.label), reel: !!f.showReel };
+      ? { heading: accent(f.heading), blurb: esc(f.blurb || ""), reel: !!f.showReel }
+      : { ...views.all, reel: !!f.showReel };
   });
   const reel = site.reelVideo && (work.showReel || filters.some((f) => f.showReel));
 
@@ -272,8 +272,8 @@ function buildWork() {
 ${nav("work")}
 <main data-filter-scope>
   <script type="application/json" data-filter-views>${jsonScript(views)}</script>
+  <!-- no kicker here: the filter buttons already say where you are -->
   <header class="page-head wrap">
-    <p class="kicker mono">${views.all.kicker}</p>
     <h1 class="display">${views.all.heading}</h1>
     <p class="blurb">${views.all.blurb}</p>
   </header>

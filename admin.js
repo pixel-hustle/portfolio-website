@@ -893,7 +893,7 @@ function renderWork() {
     </div>
     <div class="card">
       <h2 class="section" style="margin-top:0">Work page (the "All" view)</h2>
-      <label>Page name (nav link, landing page row, back-links, small label above the header)</label>
+      <label>Page name (nav link, landing page row, back-links)</label>
       <input type="text" value="\${esc(w.label || '')}" onchange="data.sections.work.label=this.value">
       <label>Landing page descriptor (the small list under the name on the home page)</label>
       <input type="text" value="\${esc(w.desc || '')}" onchange="data.sections.work.desc=this.value">
