@@ -920,33 +920,19 @@ dialog.lightbox::backdrop {
 .land-row:hover .num,
 .land-row:hover .desc { color: var(--bg); opacity: 0.7; }
 
-/* ---------- landing hero: masthead + the three section rows fill exactly
-   one viewport, so 01-03 are all reachable without scrolling.
+/* ---------- landing rows: each row is sized as if three rows shared the
+   space under the masthead in one viewport. With fewer rows the About
+   section starts to peek in below them, which is fine.
    Guarded by min-height so short windows fall back to normal flow. ---------- */
 
-.land-hero {
-  display: flex;
-  flex-direction: column;
-}
-
-/* .wrap centres itself with auto margins; as flex items those margins would
-   override stretch and shrink-wrap the content, so restore the full width */
-.land-hero > * { width: 100%; }
-
 @media (min-height: 680px) {
-  .land-hero { min-height: calc(100svh - var(--header-h)); }
-
-  .land-rows {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  /* leftover height is split evenly between the rows. Grow only — never shrink
-     below content, or a heading that wraps to two lines would be clipped by
-     the row's overflow:hidden. */
   .land-row {
-    flex: 1 0 auto;
+    /* header, masthead padding + two lines of headline, divided among 3 rows */
+    min-height: calc(
+      (100svh - var(--header-h)
+        - clamp(1.75rem, 4vh, 3rem) - clamp(1.25rem, 2.5vh, 2rem)
+        - 2 * 0.96 * clamp(2rem, 4.5vw, 3.4rem) - 1px) / 3
+    );
     align-content: center;
   }
 }
