@@ -41,6 +41,11 @@ There are five tabs:
   - **Edit** opens everything: title, **Filters** (tick every filter the
     project belongs under; it always shows under "All"), client, discipline,
     thumbnails, hero image, the **Page layout**, and credits
+  - **Carousel** (inside Edit): tick "Feature this project" to put it in the
+    rotating carousel at the top of the Work page. Up to 6 show, in list
+    order; featured projects get a ★ in the list. If nothing is ticked, the
+    first 5 case studies are used. You can also give a project a separate
+    16:10 "Carousel image" — otherwise its thumbnail is used.
   - **Page layout** is everything under the hero image, top to bottom:
     text sections, images, and YouTube videos in any order. Drag the ⋮⋮
     handle (or use ↑ ↓) to move a block. "+ Images…" lets you click several
@@ -64,7 +69,10 @@ There are five tabs:
   removes that tag from projects; nothing else is lost. This tab also holds
   the Work page's name ("My Work", used in the nav and as the landing page
   row), its header, landing descriptor, whether the reel shows in the "All"
-  view, the Archive on/off switch, and the reel video.
+  view, the Archive on/off switch, the carousel on/off switch, and the reel
+  video. The Work page is what visitors see first when they open the site;
+  the page with the big section rows and About ("Home") is where the
+  "Jared Hanline." wordmark in the header leads.
 - **Test Bench** — your tools and software experiments, with an ON/OFF
   switch for the whole section. Each tool has a name, blurb, a list of
   screenshots, and an optional link (a Download link shows a "Get This"

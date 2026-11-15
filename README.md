@@ -13,8 +13,11 @@ admin.js           ← local CMS: edit content in the browser, saves + rebuilds
 assets/img/        ← every image on the site
 assets/css/style.css
 assets/js/site.js
-index.html         ← landing: big section nav + about   (generated, don't edit by hand)
-work.html                         ← every case study, with filter buttons (generated)
+index.html         ← the Work page and site entry: featured carousel + every case
+                     study, with filter buttons   (generated, don't edit by hand)
+home.html                         ← big section nav + about; the header wordmark
+                                    leads here (generated)
+work.html                         ← redirect to index.html so old links still work
 testbench.html                    ← tools & experiments, toggleable (generated)
 archive.html                      ← smaller pieces, same filters, toggleable (generated)
 project-*.html                    ← case study pages (generated)
@@ -61,3 +64,10 @@ Cloudflare Pages. No build step needed on the host; the HTML is already built.
 - Videos are click-to-play YouTube embeds (`youtube-nocookie.com`) — nothing
   loads until the visitor hits play.
 - Case-study thumbnails swap to their animated version on hover.
+- The Work page opens with a carousel of featured projects (tick "Feature
+  this project" on a case study in the CMS). It rotates on a timer, pauses
+  on hover/focus or via its Pause button, and doesn't auto-rotate for
+  visitors with reduced-motion enabled.
+- Content below the fold fades up as it scrolls into view, filter changes
+  glide the cards into place, and case-study pages show a reading-progress
+  hairline in the header — all skipped for reduced-motion visitors.

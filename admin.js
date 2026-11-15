@@ -436,7 +436,7 @@ function renderCases() {
   const rows = data.caseStudies.map((p, i) => \`
     <div class="row" style="\${p.hidden ? 'opacity:.45' : ''}">
       <img src="/\${esc(p.thumb)}" onerror="this.style.visibility='hidden'">
-      <div class="grow"><strong>\${esc(p.title)}</strong>\${p.hidden ? ' <span style="color:var(--danger);font-size:.75rem">· hidden</span>' : ''}
+      <div class="grow"><strong>\${esc(p.title)}</strong>\${p.featured ? ' <span style="color:var(--accent);font-size:.75rem">★ in carousel</span>' : ''}\${p.hidden ? ' <span style="color:var(--danger);font-size:.75rem">· hidden</span>' : ''}
         <small>\${tagSummary(p)} · \${esc(p.client)} · \${esc(p.discipline)}</small></div>
       <button class="ghost" onclick="move(data.caseStudies, \${i}, -1)">↑</button>
       <button class="ghost" onclick="move(data.caseStudies, \${i}, 1)">↓</button>
@@ -446,7 +446,7 @@ function renderCases() {
     </div>\`).join('');
   $('#view').innerHTML = rows +
     '<p style="margin-top:1rem;"><button class="primary" onclick="addCase()">+ Add project</button></p>' +
-    '<p class="hint">Order here = order on the Work page. Remember to Save &amp; Rebuild.</p>';
+    '<p class="hint">Order here = order on the Work page, and the order of the carousel slides (★). Remember to Save &amp; Rebuild.</p>';
 }
 
 function removeCase(i) {
@@ -651,6 +651,14 @@ function renderCaseForm() {
       \${imgField('Thumbnail', p.thumb, v => data.caseStudies[editing].thumb = v)}
       \${imgField('Thumbnail on hover (animated)', p.thumbHover, v => data.caseStudies[editing].thumbHover = v, 'Optional — shown when the cursor is over the card.')}
       \${imgField('Hero image', p.hero, v => data.caseStudies[editing].hero = v, 'The big image at the top of the page, above the layout below. Leave empty for none.')}
+
+      <h2 class="section">Carousel</h2>
+      <label class="check" style="margin-top:0">
+        <input type="checkbox" \${p.featured ? 'checked' : ''}
+          onchange="const p=data.caseStudies[\${editing}]; if(this.checked) p.featured=true; else delete p.featured;">
+        Feature this project in the carousel at the top of the Work page</label>
+      <p class="hint">Up to 6 featured projects rotate there, in list order. If none are ticked, the first 5 case studies are used.</p>
+      \${imgField('Carousel image', p.carouselImage, v => data.caseStudies[editing].carouselImage = v, 'Optional — a 16:10 image just for the carousel (1600 × 1000 or larger looks sharpest). Leave empty to use the thumbnail.')}
 
       <h2 class="section">Page layout</h2>
       <p class="hint" style="margin:-.3rem 0 .8rem">Everything under the hero, top to bottom. Drag ⋮⋮ or use ↑ ↓
@@ -893,7 +901,7 @@ function renderWork() {
     </div>
     <div class="card">
       <h2 class="section" style="margin-top:0">Work page (the "All" view)</h2>
-      <label>Page name (nav link, landing page row, back-links)</label>
+      <label>Page name (nav link, Home page row, back-links)</label>
       <input type="text" value="\${esc(w.label || '')}" onchange="data.sections.work.label=this.value">
       <label>Landing page descriptor (the small list under the name on the home page)</label>
       <input type="text" value="\${esc(w.desc || '')}" onchange="data.sections.work.desc=this.value">
@@ -902,6 +910,10 @@ function renderWork() {
       <p class="hint">"&amp;" and anything wrapped in *asterisks* shows in the accent color. A "|" forces a line break.</p>
       <label>Blurb (the line under the header)</label>
       <input type="text" value="\${esc(w.blurb || '')}" onchange="data.sections.work.blurb=this.value">
+      <label class="check" style="margin-top:1.2rem">
+        <input type="checkbox" \${w.showCarousel !== false ? 'checked' : ''} onchange="data.sections.work.showCarousel=this.checked; render()">
+        Show the featured-projects carousel at the top of the page</label>
+      <p class="hint">Pick which projects appear in it under Case Studies → Edit → Carousel.</p>
       <label class="check" style="margin-top:1.2rem">
         <input type="checkbox" \${w.showReel ? 'checked' : ''} onchange="data.sections.work.showReel=this.checked; render()">
         Show the motion reel at the top of the "All" view</label>
@@ -930,7 +942,7 @@ function filterForm(f, i) {
         onchange="\${F}.label=this.value; if(!\${F}.key) renameFilterKey(\${i}, this.value)">
       <label>URL name</label>
       <input type="text" value="\${esc(f.key)}" onchange="renameFilterKey(\${i}, this.value)">
-      <p class="hint">Used in links like work.html?filter=\${esc(f.key || 'name')}. Changing it re-tags everything automatically,
+      <p class="hint">Used in links like index.html?filter=\${esc(f.key || 'name')}. Changing it re-tags everything automatically,
       but old links using the previous name will just show "All".</p>
       <label>Big header while selected (optional)</label>
       <input type="text" value="\${esc(f.heading || '')}" onchange="\${F}.heading=this.value">

@@ -65,6 +65,11 @@ img, video, iframe { display: block; max-width: 100%; }
 
 a { color: inherit; text-decoration: none; }
 
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
 ::selection { background: var(--accent); color: var(--accent-contrast); }
 
 .wrap {
@@ -101,6 +106,37 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--line);
 }
 
+/* its own layer, so cards gliding during a filter change pass beneath it */
+.site-header { view-transition-name: site-header; }
+
+/* the page slides under a frosted header instead of a flat slab */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+  }
+}
+
+/* case studies are long reads: a hairline in the header tracks progress */
+@supports (animation-timeline: scroll()) {
+  .page-project .site-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: read-progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes read-progress { to { transform: scaleX(1); } }
+
 .site-header .wrap {
   display: flex;
   align-items: center;
@@ -120,6 +156,9 @@ a { color: inherit; text-decoration: none; }
 
 .wordmark span { color: var(--accent); }
 
+.wordmark { transition: letter-spacing 0.25s ease; }
+.wordmark:hover { letter-spacing: 0.07em; }
+
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -137,7 +176,9 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 2px solid transparent;
 }
 
-.site-nav a:hover { color: var(--ink); }
+.site-nav a { transition: color 0.15s ease, border-color 0.15s ease; }
+
+.site-nav a:hover { color: var(--ink); border-bottom-color: var(--line); }
 
 .site-nav a[aria-current="page"] {
   color: var(--ink);
@@ -309,13 +350,38 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s ease;
 }
+
+/* hover: the image eases in and an accent rule draws across its base */
+.work-card figure::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.work-card a:hover figure::after,
+.work-card a:focus-visible figure::after { transform: scaleX(1); }
+
+.work-card a:hover figure img,
+.work-card a:focus-visible figure img { transform: scale(1.035); }
+
+.work-card a { display: block; }
+.work-card a:focus-visible { outline-offset: 6px; }
+
+.work-card h3 { transition: color 0.15s ease; }
 
 .work-card .thumb-hover {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.2s ease;
 }
 
 .work-card a:hover .thumb-hover,
@@ -390,6 +456,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .archive-teaser a:hover .arrow { transform: translateX(0.4rem); }
+
+.archive-teaser .display { transition: color 0.15s ease; }
+.archive-teaser a:hover .display { color: var(--accent); }
 
 /* ---------- project detail ---------- */
 
@@ -512,14 +581,38 @@ a { color: inherit; text-decoration: none; }
 
 .project-nav a {
   padding: 1.5rem 0;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 2vw, 1.5rem);
 }
 
-.project-nav a:last-child { text-align: right; }
+.project-nav a.next { flex-direction: row-reverse; text-align: right; }
+
+.project-nav a.prev { padding-right: 1rem; }
+.project-nav a.next { padding-left: 1rem; border-left: 1px solid var(--line); }
+
+/* a glimpse of where each link goes */
+.project-nav img {
+  flex: none;
+  width: clamp(5.5rem, 14vw, 11rem);
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.project-nav a.prev:hover img { transform: translateX(-0.35rem); }
+.project-nav a.next:hover img { transform: translateX(0.35rem); }
+
+.project-nav .label { min-width: 0; }
 
 .project-nav .mono { color: var(--muted); display: block; margin-bottom: 0.3rem; }
 
-.project-nav .display { font-size: clamp(1.1rem, 2.5vw, 1.6rem); }
+.project-nav .display {
+  display: block;
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  transition: color 0.15s ease;
+}
 
 .project-nav a:hover .display { color: var(--accent); }
 
@@ -1122,6 +1215,314 @@ dialog.benchbox::backdrop { background: rgba(8, 7, 5, 0.94); }
   text-align: center;
 }
 
+/* ---------- showcase: the featured carousel that opens the Work page ----------
+   One wide image per project with everything riding on it: title and
+   details bottom-left, arrows at the left and right edges, timer ticks along
+   the base. Slides are stacked in one grid cell so the stage never changes
+   height. The image can be anything, so all the chrome is light-on-dark
+   whatever the page theme. The whole slide is the link to the case study. */
+
+.showcase {
+  --showcase-ratio: 4 / 3;
+  --showcase-pad: clamp(0.9rem, 2.2vw, 1.75rem);
+  padding-top: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 620px) { .showcase { --showcase-ratio: 16 / 10; } }
+@media (min-width: 860px) { .showcase { --showcase-ratio: 2 / 1; } }
+
+.showcase-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.showcase-slide {
+  grid-area: 1 / 1;
+  position: relative;
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  color: #ece7dc;
+}
+
+.showcase-slide.is-active { visibility: visible; opacity: 1; z-index: 2; }
+
+/* the outgoing slide keeps its image on screen under the incoming wipe */
+.showcase-slide.is-leaving {
+  visibility: visible;
+  opacity: 1;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.showcase-slide.is-leaving .showcase-text { opacity: 0; }
+
+.showcase-slide figure {
+  position: relative;
+  aspect-ratio: var(--showcase-ratio);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.showcase-slide figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* a floor of shadow so the words read on any artwork */
+.showcase-slide figure::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 0;
+  background: linear-gradient(to top, rgba(10, 8, 5, 0.88), rgba(10, 8, 5, 0.5) 45%, rgba(10, 8, 5, 0));
+  pointer-events: none;
+}
+
+.showcase-slide:hover figure img { transform: scale(1.025); }
+
+.showcase-text {
+  position: absolute;
+  z-index: 1; /* above the figure, which follows it in the markup */
+  left: var(--showcase-pad);
+  right: var(--showcase-pad);
+  /* clears the tick row underneath */
+  bottom: calc(var(--showcase-pad) * 0.6 + 2rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.showcase-title { min-width: 0; }
+
+.showcase-kicker { color: #ff5c22; font-size: 0.66rem; }
+
+.showcase-text h2 {
+  font-size: clamp(1.4rem, 2.6vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-top: 0.4rem;
+  max-width: 24ch;
+}
+
+.showcase-meta {
+  color: rgba(236, 231, 220, 0.72);
+  font-size: 0.66rem;
+  margin-top: 0.45rem;
+}
+
+.showcase-cta {
+  flex: none;
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(236, 231, 220, 0.5);
+  font-size: 0.66rem;
+  font-weight: 700;
+  transition: border-color 0.15s ease;
+}
+
+@media (min-width: 620px) { .showcase-cta { display: inline-flex; } }
+
+.showcase-cta .arrow {
+  color: #ff5c22;
+  font-size: 1rem;
+  letter-spacing: 0;
+  transition: transform 0.18s ease;
+}
+
+.showcase-slide:hover .showcase-cta { border-bottom-color: #ff5c22; }
+.showcase-slide:hover .showcase-cta .arrow { transform: translateX(0.3rem); }
+
+.showcase-slide:focus-visible { outline-offset: 4px; }
+
+/* entrances — only once site.js is driving (class .is-live) */
+
+/* let the outgoing image show through until the wipe has covered it */
+.is-live .showcase-slide.is-active figure { background: none; }
+
+.is-live .showcase-slide.is-active figure img {
+  animation: showcase-wipe 0.9s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+.is-live[data-dir="prev"] .showcase-slide.is-active figure img { animation-name: showcase-wipe-back; }
+
+.is-live .showcase-slide.is-active .showcase-text > * {
+  animation: showcase-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+}
+
+.is-live .showcase-slide.is-active .showcase-text > :nth-child(2) { animation-delay: 0.4s; }
+
+@keyframes showcase-wipe {
+  from { clip-path: inset(0 0 0 100%); transform: scale(1.12); }
+  to { clip-path: inset(0); transform: scale(1); }
+}
+
+@keyframes showcase-wipe-back {
+  from { clip-path: inset(0 100% 0 0); transform: scale(1.12); }
+  to { clip-path: inset(0); transform: scale(1); }
+}
+
+@keyframes showcase-rise {
+  from { opacity: 0; transform: translateY(0.9rem); }
+  to { opacity: 1; transform: none; }
+}
+
+/* controls share the stage's grid cell, so they sit exactly on the image */
+
+.showcase-controls {
+  grid-area: 1 / 1;
+  z-index: 3;
+  display: none;
+  pointer-events: none; /* clicks fall through to the slide link */
+}
+
+.is-live .showcase-controls { display: block; }
+
+.showcase-overlay {
+  position: relative;
+  aspect-ratio: var(--showcase-ratio);
+}
+
+.showcase-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(2.4rem, 4vw, 3rem);
+  height: clamp(2.4rem, 4vw, 3rem);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: rgba(23, 20, 15, 0.55);
+  border: 1px solid rgba(236, 231, 220, 0.25);
+  color: #ece7dc;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.showcase-btn.prev { left: var(--showcase-pad); }
+.showcase-btn.next { right: var(--showcase-pad); }
+
+.showcase-btn:hover { background: #ff5c22; border-color: #ff5c22; color: #1a0d05; }
+
+/* phones: the words need the lower half, so the arrows pair up top-right */
+@media (max-width: 619px) {
+  .showcase-btn { top: var(--showcase-pad); transform: none; width: 2.25rem; height: 2.25rem; }
+  .showcase-btn.prev { left: auto; right: calc(var(--showcase-pad) + 2.25rem + 0.35rem); }
+}
+
+.showcase-bar {
+  position: absolute;
+  left: var(--showcase-pad);
+  right: var(--showcase-pad);
+  bottom: calc(var(--showcase-pad) * 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.showcase-ticks {
+  flex: 1;
+  display: flex;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+/* slim bars; the generous padding is the click target */
+.showcase-tick {
+  flex: 1;
+  min-width: 0;
+  max-width: 3.25rem;
+  padding: 0.75rem 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.showcase-tick .bar {
+  display: block;
+  height: 2px;
+  background: rgba(236, 231, 220, 0.35);
+  overflow: hidden;
+  transition: background 0.15s ease;
+}
+
+.showcase-tick:hover .bar { background: rgba(236, 231, 220, 0.75); }
+
+.showcase-tick .bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #ff5c22;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* without the animation (reduced motion) the active bar just reads as full */
+.showcase-tick.is-active .bar i {
+  transform: scaleX(1);
+  animation: showcase-fill 6.5s linear both;
+}
+
+.showcase.is-paused .showcase-tick.is-active .bar i { animation-play-state: paused; }
+
+@keyframes showcase-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.showcase-pause {
+  padding: 0.5rem 0;
+  border: 0;
+  background: none;
+  color: rgba(236, 231, 220, 0.6);
+  font-size: 0.64rem;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.15s ease;
+}
+
+.showcase-pause:hover { color: #ff5c22; }
+
+.showcase-btn:focus-visible,
+.showcase-tick:focus-visible,
+.showcase-pause:focus-visible { outline-color: #ff5c22; }
+
+/* the page header follows the showcase, so it needs less air above it */
+.showcase + .page-head { padding-top: clamp(2.25rem, 5vw, 3.75rem); }
+
+/* ---------- scroll reveals (site.js adds .reveal only below the fold) ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.reveal-in { opacity: 1; transform: none; }
+
+/* second column trails the first by a beat */
+@media (min-width: 760px) {
+  .work-card.reveal:nth-child(even) { transition-delay: 0.09s; }
+}
+
+/* ---------- filter changes: cards glide to their new places ---------- */
+
+::view-transition-group(*) { animation-duration: 0.4s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.25s; }
+
 /* ---------- motion preferences ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1149,5 +1550,12 @@ dialog.benchbox::backdrop { background: rgba(8, 7, 5, 0.94); }
     gap: 0.4rem;
   }
   .project-nav { grid-template-columns: 1fr; }
-  .project-nav a:last-child { text-align: left; border-top: 1px solid var(--line); }
+  .project-nav a.prev { padding-right: 0; }
+  .project-nav a.next {
+    flex-direction: row;
+    text-align: left;
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
 }

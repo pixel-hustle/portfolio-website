@@ -14,19 +14,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders:opsz,wght@10..72,700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="page-project">
 <script src="assets/js/transition.js"></script>
 <header class="site-header">
   <div class="wrap">
-    <a class="wordmark" href="index.html">Jared Hanline<span>.</span></a>
+    <a class="wordmark" href="home.html">Jared Hanline<span>.</span></a>
     <nav class="site-nav" aria-label="Main">
-      <a href="work.html" aria-current="page">My Work</a>
+      <a href="index.html" aria-current="page">My Work</a>
       <a href="testbench.html">Test Bench</a>
     </nav>
   </div>
 </header>
 <main class="wrap">
-  <a class="back-link mono" href="work.html#work" data-back-work>&larr; My Work</a>
+  <a class="back-link mono" href="index.html#work" data-back-work>&larr; My Work</a>
   <header class="project-head">
     <h1 class="display">CleverCX Conversation Template</h1>
     <dl class="project-meta">
@@ -66,13 +66,19 @@
   </section>
 
   <nav class="project-nav" aria-label="Project navigation">
-    <a href="project-insp-network-look.html">
-      <span class="mono">&larr; Previous</span>
-      <span class="display">INSP Network Look</span>
+    <a class="prev" href="project-insp-network-look.html">
+      <img src="assets/img/portfolio-inspnetlook-tn1.webp" alt="" loading="lazy">
+      <span class="label">
+        <span class="mono">&larr; Previous</span>
+        <span class="display">INSP Network Look</span>
+      </span>
     </a>
-    <a href="project-dna-culture-handbook.html">
-      <span class="mono">Next &rarr;</span>
-      <span class="display">DNA Culture Handbook</span>
+    <a class="next" href="project-dna-culture-handbook.html">
+      <img src="assets/img/project-dnajournal-tn1.webp" alt="" loading="lazy">
+      <span class="label">
+        <span class="mono">Next &rarr;</span>
+        <span class="display">DNA Culture Handbook</span>
+      </span>
     </a>
   </nav>
 </main>

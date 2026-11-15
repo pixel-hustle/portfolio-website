@@ -23,6 +23,7 @@ bindFacades(document);
 // Items carry data-tags; the chosen filter lives in ?filter= so it can be
 // linked to (landing rows, old motion.html / design.html redirects).
 const FILTER_KEY = "workFilter";
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const pad2 = (n) => String(n).padStart(2, "0");
 
 document.querySelectorAll("[data-filter-scope]").forEach((scope) => {
@@ -84,7 +85,15 @@ document.querySelectorAll("[data-filter-scope]").forEach((scope) => {
     try { sessionStorage.setItem(FILTER_KEY, key); } catch (e) {}
   }
 
-  buttons.forEach((b) => b.addEventListener("click", () => apply(b.dataset.filter)));
+  // clicking a filter lets the cards glide to their new places where the
+  // browser supports view transitions; everywhere else it just swaps
+  const animated = document.startViewTransition && !REDUCED_MOTION;
+  buttons.forEach((b) =>
+    b.addEventListener("click", () => {
+      if (animated) document.startViewTransition(() => apply(b.dataset.filter));
+      else apply(b.dataset.filter);
+    })
+  );
   apply(new URLSearchParams(location.search).get("filter") || "all");
 });
 
@@ -92,7 +101,7 @@ document.querySelectorAll("[data-filter-scope]").forEach((scope) => {
 document.querySelectorAll("[data-back-work]").forEach((a) => {
   let key = null;
   try { key = sessionStorage.getItem(FILTER_KEY); } catch (e) {}
-  if (key && key !== "all") a.setAttribute("href", `work.html?filter=${encodeURIComponent(key)}#work`);
+  if (key && key !== "all") a.setAttribute("href", `index.html?filter=${encodeURIComponent(key)}#work`);
 });
 
 // ---- Archive lightbox ----
@@ -194,5 +203,134 @@ if (benchbox) {
     if (shots.length < 2) return;
     if (e.key === "ArrowLeft") { e.preventDefault(); show(at - 1); }
     if (e.key === "ArrowRight") { e.preventDefault(); show(at + 1); }
+  });
+}
+
+// ---- Featured carousel (top of the Work page) ----
+// The active tick's progress bar is a CSS animation; when it finishes we
+// advance. Pausing is just pausing that animation, so the bar and the
+// timer can never disagree — and reduced-motion (which disables the
+// animation) switches auto-rotation off for free.
+document.querySelectorAll("[data-showcase]").forEach((root) => {
+  const slides = [...root.querySelectorAll("[data-slide]")];
+  const ticks = [...root.querySelectorAll("[data-go]")];
+  if (slides.length < 2 || !ticks.length) return;
+
+  const stage = root.querySelector(".showcase-stage");
+  const pauseBtn = root.querySelector("[data-pause]");
+  const n = slides.length;
+  const hold = { user: false, hover: false, focus: false, away: false };
+  let at = 0;
+  let leaveTimer;
+
+  root.classList.add("is-live");
+
+  const sync = () =>
+    root.classList.toggle("is-paused", hold.user || hold.hover || hold.focus || hold.away);
+
+  function go(i, dir) {
+    i = (i + n) % n;
+    if (i === at) return;
+    const prev = slides[at];
+    slides.forEach((s) => s.classList.remove("is-leaving"));
+    // the outgoing image stays put underneath while the new one wipes over it
+    prev.classList.remove("is-active");
+    prev.classList.add("is-leaving");
+    root.dataset.dir = dir;
+    slides[i].classList.add("is-active");
+    ticks.forEach((t, k) => {
+      t.classList.toggle("is-active", k === i);
+      if (k === i) t.setAttribute("aria-current", "true");
+      else t.removeAttribute("aria-current");
+    });
+    at = i;
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(() => prev.classList.remove("is-leaving"), 1000);
+  }
+
+  root.addEventListener("animationend", (e) => {
+    if (e.animationName === "showcase-fill") go(at + 1, "next");
+  });
+
+  ticks.forEach((t) =>
+    t.addEventListener("click", () => {
+      const i = Number(t.dataset.go);
+      go(i, i > at ? "next" : "prev");
+    })
+  );
+  root.querySelector("[data-prev]").addEventListener("click", () => go(at - 1, "prev"));
+  root.querySelector("[data-next]").addEventListener("click", () => go(at + 1, "next"));
+
+  pauseBtn.addEventListener("click", () => {
+    hold.user = !hold.user;
+    pauseBtn.textContent = hold.user ? "Play" : "Pause";
+    pauseBtn.setAttribute("aria-label", hold.user ? "Resume rotation" : "Pause rotation");
+    sync();
+  });
+  if (REDUCED_MOTION) pauseBtn.hidden = true; // nothing rotates on its own
+
+  // hold still while someone is reading, tabbing through, or scrolled away
+  stage.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { hold.hover = true; sync(); } });
+  stage.addEventListener("pointerleave", () => { hold.hover = false; sync(); });
+  root.addEventListener("focusin", (e) => { hold.focus = e.target.matches(":focus-visible"); sync(); });
+  root.addEventListener("focusout", () => { hold.focus = false; sync(); });
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([entry]) => { hold.away = !entry.isIntersecting; sync(); }, { threshold: 0.25 }).observe(root);
+  }
+
+  root.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(at - 1, "prev"); }
+    if (e.key === "ArrowRight") { e.preventDefault(); go(at + 1, "next"); }
+  });
+
+  // swipe on touch screens; a swipe must not also count as a tap on the slide
+  let startX = null;
+  let startY = 0;
+  let swiped = false;
+  stage.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    swiped = false;
+  }, { passive: true });
+  stage.addEventListener("touchend", (e) => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    startX = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      swiped = true;
+      if (dx < 0) go(at + 1, "next");
+      else go(at - 1, "prev");
+    }
+  }, { passive: true });
+  stage.addEventListener("click", (e) => {
+    if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; }
+  }, true);
+});
+
+// ---- Scroll reveals ----
+// Only things that start below the fold are held back, so nothing on
+// screen at load ever flashes. Without JS (or with reduced motion)
+// everything is simply visible.
+if (!REDUCED_MOTION && "IntersectionObserver" in window) {
+  const targets = document.querySelectorAll(
+    ".work-card, .archive-card, .section-head, .project-section, .project-media figure, " +
+      ".project-credits, .project-nav, .archive-teaser, .bench-entry, .about-intro, .footer-cta"
+  );
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("reveal-in");
+        io.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "0px 0px -8% 0px" }
+  );
+  const fold = window.innerHeight;
+  targets.forEach((el) => {
+    if (el.getBoundingClientRect().top < fold) return;
+    el.classList.add("reveal");
+    io.observe(el);
   });
 }

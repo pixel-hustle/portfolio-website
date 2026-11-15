@@ -5,8 +5,11 @@
  *   node build.js
  *
  * Outputs (repo root):
- *   index.html                      landing (big section nav + about)
- *   work.html                       all case studies, filterable by tag
+ *   index.html                      the Work page — featured carousel + every
+ *                                   case study, filterable by tag (site entry)
+ *   home.html                       landing (big section nav + about); the
+ *                                   wordmark in the header leads here
+ *   work.html                       redirect → index.html (keeps old links alive)
  *   testbench.html                  tools & software experiments (toggleable)
  *   archive.html                    smaller pieces, same filters (toggleable)
  *   project-<slug>.html             one per case study
@@ -64,7 +67,12 @@ const playIcon = `<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"
 const tagsOf = (item) => (item.tags || []).filter((t) => filters.some((f) => f.key === t));
 const liveCases = caseStudies.filter((p) => !p.hidden);
 const liveArchive = archive.filter((a) => !a.hidden);
-const workHref = (key) => (key ? `work.html?filter=${encodeURIComponent(key)}` : "work.html");
+// the Work page is the site's front door, so it lives at index.html
+const WORK_PAGE = "index.html";
+const HOME_PAGE = "home.html";
+const workHref = (key) => (key ? `${WORK_PAGE}?filter=${encodeURIComponent(key)}` : WORK_PAGE);
+const MAX_FEATURED = 6; // carousel slides when projects are ticked "featured"
+const FALLBACK_FEATURED = 5; // …and when none are: the first few case studies
 const hasFilter = (key) => filters.some((f) => f.key === key);
 
 // safe to drop inside <script type="application/json">
@@ -81,7 +89,7 @@ function videoFacade(id, label, poster) {
 
 // ---------- shared shell ----------
 
-function head(title, description, image) {
+function head(title, description, image, bodyClass) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +106,7 @@ ${image ? `<meta property="og:image" content="${esc(image)}">` : ""}
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders:opsz,wght@10..72,700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body${bodyClass ? ` class="${bodyClass}"` : ""}>
 <script src="assets/js/transition.js"></script>`;
 }
 
@@ -111,12 +119,12 @@ function nav(active) {
       ? ""
       : `
     <nav class="site-nav" aria-label="Main">
-      ${link("work.html", esc(work.label), "work")}
+      ${link(WORK_PAGE, esc(work.label), "work")}
       ${testbench.enabled ? link("testbench.html", esc(sections.testbench.label), "testbench") : ""}
     </nav>`;
   return `<header class="site-header">
   <div class="wrap">
-    <a class="wordmark" href="index.html">Jared Hanline<span>.</span></a>${links}
+    <a class="wordmark" href="${HOME_PAGE}">Jared Hanline<span>.</span></a>${links}
   </div>
 </header>`;
 }
@@ -151,7 +159,7 @@ function footer() {
 function workGrid(list) {
   return list
     .map(
-      (p, i) => `<article class="work-card" data-tags="${esc(tagsOf(p).join(" "))}">
+      (p, i) => `<article class="work-card" data-tags="${esc(tagsOf(p).join(" "))}" style="view-transition-name:card-${esc(p.slug)}">
   <a href="project-${esc(p.slug)}.html">
     <figure>
       <img src="${esc(p.thumb)}" alt="${esc(p.title)}" loading="${i < 2 ? "eager" : "lazy"}">
@@ -196,10 +204,71 @@ function filterBar(list, label) {
   </div>`;
 }
 
+// The rotating carousel that opens the Work page. Projects opt in with
+// `featured`; with none ticked, the first few case studies stand in.
+// Slide 1 is fully usable without JS; site.js adds rotation + controls.
+function showcase() {
+  if (work.showCarousel === false) return "";
+  const usable = liveCases.filter((p) => p.carouselImage || p.thumb);
+  let picks = usable.filter((p) => p.featured).slice(0, MAX_FEATURED);
+  if (!picks.length) picks = usable.slice(0, FALLBACK_FEATURED);
+  if (!picks.length) return "";
+  const total = picks.length;
+
+  const slides = picks
+    .map(
+      (p, i) => `<a class="showcase-slide${i === 0 ? " is-active" : ""}" href="project-${esc(p.slug)}.html" data-slide
+      aria-roledescription="slide" aria-label="${i + 1} of ${total}: ${esc(p.title)}">
+      <div class="showcase-text">
+        <div class="showcase-title">
+          <p class="showcase-kicker mono">Featured</p>
+          <h2 class="display">${esc(p.title)}</h2>
+          <p class="showcase-meta mono">${esc(p.client)} &middot; ${esc(p.discipline)}</p>
+        </div>
+        <span class="showcase-cta mono">View case study <span class="arrow" aria-hidden="true">&rarr;</span></span>
+      </div>
+      <figure><img src="${esc(p.carouselImage || p.thumb)}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}></figure>
+    </a>`
+    )
+    .join("\n    ");
+
+  const ticks = picks
+    .map(
+      (p, i) => `<button type="button" class="showcase-tick${i === 0 ? " is-active" : ""}" data-go="${i}"${i === 0 ? ' aria-current="true"' : ""} aria-label="Show ${esc(p.title)} (${i + 1} of ${total})">
+        <span class="bar"><i></i></span>
+      </button>`
+    )
+    .join("\n      ");
+
+  // the controls sit in the stage's own grid cell, so they overlay the image
+  return `  <section class="showcase wrap" data-showcase aria-roledescription="carousel" aria-label="Featured projects">
+    <div class="showcase-stage">
+    ${slides}
+    ${
+      total > 1
+        ? `<div class="showcase-controls">
+      <div class="showcase-overlay">
+        <button type="button" class="showcase-btn prev" data-prev aria-label="Previous project">&larr;</button>
+        <button type="button" class="showcase-btn next" data-next aria-label="Next project">&rarr;</button>
+        <div class="showcase-bar">
+          <div class="showcase-ticks">
+      ${ticks}
+          </div>
+          <button type="button" class="showcase-pause mono" data-pause aria-label="Pause rotation">Pause</button>
+        </div>
+      </div>
+    </div>`
+        : ""
+    }
+    </div>
+  </section>
+`;
+}
+
 // ---------- landing ----------
 
 function buildLanding() {
-  const rows = [{ href: "work.html", label: work.label, desc: work.desc || "" }];
+  const rows = [{ href: WORK_PAGE, label: work.label, desc: work.desc || "" }];
   if (testbench.enabled) {
     rows.push({
       href: "testbench.html",
@@ -268,10 +337,12 @@ function buildWork() {
   });
   const reel = site.reelVideo && (work.showReel || filters.some((f) => f.showReel));
 
-  return `${head(`${work.label} — ${site.name}`, `Branding, design, and motion work by ${site.name}.`, site.reelPoster)}
+  // this is the page visitors land on, so it carries the site's own title
+  return `${head(site.title, site.tagline, site.reelPoster)}
 ${nav("work")}
 <main data-filter-scope>
   <script type="application/json" data-filter-views>${jsonScript(views)}</script>
+${showcase()}
   <!-- no kicker here: the filter buttons already say where you are -->
   <header class="page-head wrap">
     <h1 class="display">${views.all.heading}</h1>
@@ -310,7 +381,7 @@ ${footer()}`;
 }
 
 // old section URLs stay alive as redirects to the matching filter
-function redirectPage(to) {
+function redirectPage(to, keepQuery) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -319,7 +390,7 @@ function redirectPage(to) {
 <meta name="robots" content="noindex">
 <link rel="canonical" href="${esc(to)}">
 <meta http-equiv="refresh" content="0; url=${esc(to)}">
-<script>location.replace(${JSON.stringify(to)} + location.hash)</script>
+<script>location.replace(${JSON.stringify(to)} + ${keepQuery ? "location.search + " : ""}location.hash)</script>
 </head>
 <body><a href="${esc(to)}">Continue</a></body>
 </html>
@@ -437,6 +508,8 @@ function projectBlocks(p) {
   return out.join("\n");
 }
 
+const navThumb = (p) => (p.thumb ? `<img src="${esc(p.thumb)}" alt="" loading="lazy">` : "");
+
 function buildProject(p) {
   const i = liveCases.findIndex((x) => x.slug === p.slug);
   const prev = liveCases[(i - 1 + liveCases.length) % liveCases.length] || p;
@@ -444,10 +517,10 @@ function buildProject(p) {
 
   const credits = (p.credits || []).map((c) => `<li>${esc(c)}</li>`).join("\n      ");
 
-  return `${head(`${p.title} — ${site.name}`, `${p.title} · ${p.client} · ${p.discipline}`, p.hero)}
+  return `${head(`${p.title} — ${site.name}`, `${p.title} · ${p.client} · ${p.discipline}`, p.hero, "page-project")}
 ${nav("work")}
 <main class="wrap">
-  <a class="back-link mono" href="work.html#work" data-back-work>&larr; ${esc(work.label)}</a>
+  <a class="back-link mono" href="${WORK_PAGE}#work" data-back-work>&larr; ${esc(work.label)}</a>
   <header class="project-head">
     <h1 class="display">${esc(p.title)}</h1>
     <dl class="project-meta">
@@ -469,13 +542,19 @@ ${projectBlocks(p)}
   </section>
 
   <nav class="project-nav" aria-label="Project navigation">
-    <a href="project-${esc(prev.slug)}.html">
-      <span class="mono">&larr; Previous</span>
-      <span class="display">${esc(prev.title)}</span>
+    <a class="prev" href="project-${esc(prev.slug)}.html">
+      ${navThumb(prev)}
+      <span class="label">
+        <span class="mono">&larr; Previous</span>
+        <span class="display">${esc(prev.title)}</span>
+      </span>
     </a>
-    <a href="project-${esc(next.slug)}.html">
-      <span class="mono">Next &rarr;</span>
-      <span class="display">${esc(next.title)}</span>
+    <a class="next" href="project-${esc(next.slug)}.html">
+      ${navThumb(next)}
+      <span class="label">
+        <span class="mono">Next &rarr;</span>
+        <span class="display">${esc(next.title)}</span>
+      </span>
     </a>
   </nav>
 </main>
@@ -500,7 +579,7 @@ function buildArchive() {
   return `${head(`Archive — ${site.name}`, `More branding, design, and motion work by ${site.name}.`)}
 ${nav("work")}
 <main class="wrap" data-filter-scope>
-  <a class="back-link mono" href="work.html#work" data-back-work>&larr; ${esc(work.label)}</a>
+  <a class="back-link mono" href="${WORK_PAGE}#work" data-back-work>&larr; ${esc(work.label)}</a>
   <header class="page-head">
     <h1 class="display">The Archive</h1>
     <p class="lede">Smaller pieces &mdash; logos, identities, IDs, and intros &mdash; that didn't need a full case study. Click any piece to view it.</p>
@@ -536,17 +615,17 @@ console.log("Building site from data/data.json ...");
 const legacy = {
   "motion.html": workHref(hasFilter("motion") && "motion"),
   "design.html": workHref(hasFilter("design") && "design"),
-  "archive-motion.html": work.archiveEnabled ? `archive.html${hasFilter("motion") ? "?filter=motion" : ""}` : "work.html",
-  "archive-design.html": work.archiveEnabled ? `archive.html${hasFilter("design") ? "?filter=design" : ""}` : "work.html",
+  "archive-motion.html": work.archiveEnabled ? `archive.html${hasFilter("motion") ? "?filter=motion" : ""}` : WORK_PAGE,
+  "archive-design.html": work.archiveEnabled ? `archive.html${hasFilter("design") ? "?filter=design" : ""}` : WORK_PAGE,
 };
 
-const expected = new Set(["index.html", "work.html", ...Object.keys(legacy)]);
+const expected = new Set([WORK_PAGE, HOME_PAGE, "work.html", ...Object.keys(legacy)]);
 if (testbench.enabled) expected.add("testbench.html");
 if (work.archiveEnabled) expected.add("archive.html");
 liveCases.forEach((p) => expected.add(`project-${p.slug}.html`));
 
 // remove generated pages that shouldn't exist anymore
-const generated = /^(project-.*|about|archive|archive-motion|archive-design|motion|design|work|testbench)\.html$/;
+const generated = /^(project-.*|home|about|archive|archive-motion|archive-design|motion|design|work|testbench)\.html$/;
 for (const f of fs.readdirSync(ROOT)) {
   if (generated.test(f) && !expected.has(f)) {
     fs.unlinkSync(path.join(ROOT, f));
@@ -554,8 +633,10 @@ for (const f of fs.readdirSync(ROOT)) {
   }
 }
 
-write("index.html", buildLanding());
-write("work.html", buildWork());
+write(WORK_PAGE, buildWork());
+write(HOME_PAGE, buildLanding());
+// the Work page used to live at work.html — old links (and their ?filter=) still land
+write("work.html", redirectPage(WORK_PAGE, true));
 if (testbench.enabled) write("testbench.html", buildTestbench());
 liveCases.forEach((p) => write(`project-${p.slug}.html`, buildProject(p)));
 if (work.archiveEnabled) write("archive.html", buildArchive());
