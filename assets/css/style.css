@@ -271,3 +271,18 @@ figure.media figcaption{padding:10px 14px;background:var(--card);color:var(--mut
   *,*::before,*::after{transition:none!important;animation:none!important}
   @view-transition{navigation:none}
 }
+/* logo wall names: always one line, so they can't climb into the mark */
+.logo .nm span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo .nm b{flex:none}
+@media(max-width:900px){
+  /* no hover on touch: drop the "View project" hint and give the name the full width */
+  .logo .nm b{display:none}
+  .logo .art{inset:22% 22% 34%}
+  .logo .nm{left:12px;right:12px;bottom:11px;font-size:9.5px;letter-spacing:.05em}
+}
+/* header never wraps; on the narrowest phones it tightens instead */
+.bar b,.pill{white-space:nowrap}
+@media(max-width:380px){
+  .bar{padding:5px 5px 5px 12px}.bar b{font-size:13px}
+  .pills{gap:2px}.pill{padding:7px 9px;font-size:12px}
+}
