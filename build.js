@@ -34,6 +34,11 @@ const testbench = d.testbench || { enabled: false, items: [] };
 if (!sections.testbench)
   sections.testbench = { label: "Test Bench", desc: "After Effects Extensions / Software Experiments", heading: "Test Bench", blurb: "" };
 
+// Stylesheet and script links carry a fingerprint of the file's contents, so
+// a browser can never pair a freshly built page with an older cached copy.
+const stamp = (file) =>
+  `${file}?v=${require("crypto").createHash("md5").update(fs.readFileSync(path.join(ROOT, file))).digest("hex").slice(0, 8)}`;
+
 const WORK_PAGE = "index.html";
 const LOGOS_PAGE = "logos.html";
 
@@ -103,7 +108,7 @@ ${image ? `<meta property="og:image" content="${esc(image)}">` : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="${stamp("assets/css/style.css")}">
 <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
@@ -136,7 +141,7 @@ function footer() {
 </section>
 </div>
 <dialog class="look"><header><strong></strong><button class="pill on" type="button">Close &#10005;</button></header><div class="stack"></div></dialog>
-<script src="assets/js/site.js"></script>
+<script src="${stamp("assets/js/site.js")}"></script>
 </body>
 </html>`;
 }
