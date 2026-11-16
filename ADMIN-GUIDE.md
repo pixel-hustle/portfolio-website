@@ -32,7 +32,14 @@ edit the About page. When you hit save, it rebuilds the website files.
 
 ## Using it
 
-There are five tabs:
+> **Since the Studio redesign:** everything shows on one Work page. Use the
+> **Work Grid** tab to set the order and size of every box, and the **Logos**
+> tab to add logos to the logo wall (add an SVG and it appears). Archive
+> pieces now sit on the Work page as small boxes that open in a pop-up; there
+> is no separate Archive page or landing page, and the carousel is retired
+> (its settings no longer do anything).
+
+There are seven tabs (the notes below predate Logos and Work Grid):
 
 - **Case Studies**: one list of every project.
   - ↑ / ↓ reorder them (order here = order on the Work page)

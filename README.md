@@ -7,23 +7,25 @@ data file.
 ## How it works
 
 ```
-data/data.json     ← ALL content lives here (projects, archives, test bench, about, site info)
+data/data.json     ← ALL content lives here (projects, archive pieces, logos, test bench, about, site info)
 build.js           ← turns data.json into the HTML pages
 admin.js           ← local CMS: edit content in the browser, saves + rebuilds
 assets/img/        ← every image on the site
 assets/css/style.css
 assets/js/site.js
-index.html         ← the Work page and site entry: featured carousel + every case
-                     study, with filter buttons   (generated, don't edit by hand)
-home.html                         ← big section nav + about; the header wordmark
-                                    leads here (generated)
-work.html                         ← redirect to index.html so old links still work
-testbench.html                    ← tools & experiments, toggleable (generated)
-archive.html                      ← smaller pieces, same filters, toggleable (generated)
-project-*.html                    ← case study pages (generated)
-motion.html, design.html, archive-motion.html, archive-design.html
-                                  ← redirects so old links land on the matching filter
+index.html         ← the Work page and site entry: statement, reel, one grid of every
+                     project with filters, and the About card   (generated, don't edit by hand)
+project-*.html     ← case study pages (generated)
+logos.html         ← the logo wall (generated)
+testbench.html     ← tools & experiments, toggleable (generated)
+home.html, work.html, archive.html, motion.html, design.html, archive-*.html
+                   ← redirects so old links still land
 ```
+
+The previous design (editorial, with a separate landing page and Archive page)
+is kept at the git tag `v2-live`. The data file kept its shape, so
+`git checkout v2-live -- build.js assets/css assets/js && node build.js`
+brings that version back from today's content.
 
 ## Editing content (the CMS)
 
@@ -54,20 +56,14 @@ Cloudflare Pages. No build step needed on the host; the HTML is already built.
 
 ## Design notes
 
-- Light/dark mode follows the visitor's OS setting automatically
-  (`prefers-color-scheme`) — no toggle, no JS.
-- Fonts: Big Shoulders (display) + Archivo (text) from Google Fonts.
-- Page transitions: a mosaic tile wipe (`assets/js/transition.js`) sweeps
-  upper-left to lower-right to cover the page on internal navigation, then
-  sweeps the same direction to reveal the next page; disabled automatically
-  for visitors with reduced-motion enabled.
-- Videos are click-to-play YouTube embeds (`youtube-nocookie.com`) — nothing
-  loads until the visitor hits play.
-- Case-study thumbnails swap to their animated version on hover.
-- The Work page opens with a carousel of featured projects (tick "Feature
-  this project" on a case study in the CMS). It rotates on a timer, pauses
-  on hover/focus or via its Pause button, and doesn't auto-rotate for
-  visitors with reduced-motion enabled.
-- Content below the fold fades up as it scrolls into view, filter changes
-  glide the cards into place, and case-study pages show a reading-progress
-  hairline in the header — all skipped for reduced-motion visitors.
+- "Studio" look: soft grey page, white rounded cards, one orange accent;
+  Inter Tight with JetBrains Mono labels.
+- Light/dark mode follows the visitor's OS setting automatically — no toggle.
+- The Work grid is four columns of equal cells. Every project is a box of some
+  size (Small, Wide, Tall, Large, Full); order and size are set in the CMS's
+  Work Grid tab. Case studies open their own page; smaller pieces open in a
+  pop-up viewer; the Logo Design box opens the logo wall.
+- Logos on the wall are drawn from a single-colour file (SVG ideally) that the
+  site tints for light and dark; an optional full-colour file shows on hover.
+- Filters animate boxes out, across and in. Videos are click-to-play YouTube
+  embeds (`youtube-nocookie.com`). Motion is skipped for reduced-motion visitors.

@@ -11,178 +11,57 @@
 <link rel="icon" href="assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders:opsz,wght@10..72,700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
-<script src="assets/js/transition.js"></script>
-<header class="site-header">
-  <div class="wrap">
-    <a class="wordmark" href="home.html">Jared Hanline<span>.</span></a>
-    <nav class="site-nav" aria-label="Main">
-      <a href="index.html">My Work</a>
-      <a href="testbench.html" aria-current="page">Test Bench</a>
-    </nav>
-  </div>
+<div class="page">
+<header class="bar">
+  <a href="index.html"><b>Jared Hanline<i>.</i></b></a>
+  <nav class="pills" aria-label="Main">
+    <a class="pill" href="index.html">My Work</a>
+    <a class="pill on" href="testbench.html" aria-current="page">Test Bench</a>
+    <a class="pill" href="index.html#about">About</a>
+    <a class="pill cta" href="mailto:jhanline@gmail.com?subject=Work%20Inquiry">Let's talk &nearr;</a>
+  </nav>
 </header>
 <main>
-  <header class="page-head wrap">
-    <p class="kicker mono">Test Bench</p>
-    <h1 class="display">Tinker &#39;til<br>it <em>Works</em></h1>
-    <p class="blurb">Or at least breaks a little less.</p>
-  </header>
-  <section class="section wrap" style="padding-top:0">
-    <div class="bench-list">
-<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">01</span>
-    <h2 class="display">Matchbook</h2>
-    <p class="bench-blurb">Easy asset delivery and versioning. A client needs a specific size of their logo, with Matchbook, they can create it quickly—using the brand colors without having to look up hex codes. Access brand fonts and colors, and download master .ai files from one single link</p>
-    <a class="bench-link" href="https://matchbook.matchstick-creative.com/matchstick-n6nqxmt4" target="_blank" rel="noopener">Try it &nearr;</a>
-    
-  </div>
-<div class="bench-media">
-  <button class="bench-shot" type="button"
-    data-bench="{&quot;title&quot;:&quot;Matchbook&quot;,&quot;images&quot;:[&quot;assets/img/testbench-matchbook.png&quot;]}" data-index="0"
-    aria-label="View Matchbook screenshot 1 of 1">
-    <img src="assets/img/testbench-matchbook.png" alt="Matchbook screenshot 1" loading="eager">
-  </button>
-  
-</div>
+<div class="grid">
+  <section class="box wallhead"><div><h1 class="big">Tinker &#39;til<br>it <span>Works</span></h1></div><p>Or at least breaks a little less.</p></section>
+  <article class="bench rise">
+  <div class="box info"><span class="num mono">01</span><h2>Matchbook</h2><p>Easy asset delivery and versioning. A client needs a specific size of their logo, with Matchbook, they can create it quickly—using the brand colors without having to look up hex codes. Access brand fonts and colors, and download master .ai files from one single link</p><a class="pill cta" href="https://matchbook.matchstick-creative.com/matchstick-n6nqxmt4" target="_blank" rel="noopener">Try it &nearr;</a></div>
+  <div class="shots"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Matchbook&quot;,&quot;images&quot;:[&quot;assets/img/testbench-matchbook.png&quot;]}" data-index="0" aria-label="View Matchbook screenshot 1 of 1"><img src="assets/img/testbench-matchbook.png" alt="Matchbook screenshot 1" loading="lazy"></button></div>
 </article>
-<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">02</span>
-    <h2 class="display">Snipe Hunter</h2>
-    <p class="bench-blurb">Data merge for After Effects. Version out using spreadsheet data to replace images/videos, text, colors, or anything you can imagine.
+<article class="bench rise">
+  <div class="box info"><span class="num mono">02</span><h2>Snipe Hunter</h2><p>Data merge for After Effects. Version out using spreadsheet data to replace images/videos, text, colors, or anything you can imagine.
 
-Save config files and use in Snipe Buddy, a companion app that let&#39;s anyone with an Excel file create the versions they need with a click of a button.</p>
-    
-    <p class="bench-count mono">02 screens &mdash; click to enlarge</p>
-  </div>
-<div class="bench-media">
-  <button class="bench-shot" type="button"
-    data-bench="{&quot;title&quot;:&quot;Snipe Hunter&quot;,&quot;images&quot;:[&quot;assets/img/testbench-snipehunter1.png&quot;,&quot;assets/img/testbench-snipehunter2.png&quot;]}" data-index="0"
-    aria-label="View Snipe Hunter screenshot 1 of 2">
-    <img src="assets/img/testbench-snipehunter1.png" alt="Snipe Hunter screenshot 1" loading="lazy">
-  </button>
-  <div class="bench-thumbs">
-  <button class="bench-thumb" type="button"
-    data-bench="{&quot;title&quot;:&quot;Snipe Hunter&quot;,&quot;images&quot;:[&quot;assets/img/testbench-snipehunter1.png&quot;,&quot;assets/img/testbench-snipehunter2.png&quot;]}" data-index="1"
-    aria-label="View Snipe Hunter screenshot 2 of 2">
-    <img src="assets/img/testbench-snipehunter2.png" alt="Snipe Hunter screenshot 2" loading="lazy">
-  </button>
-</div>
-</div>
+Save config files and use in Snipe Buddy, a companion app that let&#39;s anyone with an Excel file create the versions they need with a click of a button.</p></div>
+  <div class="shots"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Snipe Hunter&quot;,&quot;images&quot;:[&quot;assets/img/testbench-snipehunter1.png&quot;,&quot;assets/img/testbench-snipehunter2.png&quot;]}" data-index="0" aria-label="View Snipe Hunter screenshot 1 of 2"><img src="assets/img/testbench-snipehunter1.png" alt="Snipe Hunter screenshot 1" loading="lazy"></button><div class="thumbs"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Snipe Hunter&quot;,&quot;images&quot;:[&quot;assets/img/testbench-snipehunter1.png&quot;,&quot;assets/img/testbench-snipehunter2.png&quot;]}" data-index="1" aria-label="View Snipe Hunter screenshot 2 of 2"><img src="assets/img/testbench-snipehunter2.png" alt="Snipe Hunter screenshot 2" loading="lazy"></button></div></div>
 </article>
-<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">03</span>
-    <h2 class="display">Phosphor</h2>
-    <p class="bench-blurb">An expression editing IDE. A much larger interface for writing expressions that includes IDE coloring and an expression library for you to save and re-use your favorites. Create an easy expression that allows you to edit placeholders more quickly then scrolling through your entire script and highlighting and retyping values.</p>
-    
-    
-  </div>
-<div class="bench-media">
-  <button class="bench-shot" type="button"
-    data-bench="{&quot;title&quot;:&quot;Phosphor&quot;,&quot;images&quot;:[&quot;assets/img/testbench-phosphor1.png&quot;]}" data-index="0"
-    aria-label="View Phosphor screenshot 1 of 1">
-    <img src="assets/img/testbench-phosphor1.png" alt="Phosphor screenshot 1" loading="lazy">
-  </button>
-  
-</div>
+<article class="bench rise">
+  <div class="box info"><span class="num mono">03</span><h2>Phosphor</h2><p>An expression editing IDE. A much larger interface for writing expressions that includes IDE coloring and an expression library for you to save and re-use your favorites. Create an easy expression that allows you to edit placeholders more quickly then scrolling through your entire script and highlighting and retyping values.</p></div>
+  <div class="shots"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Phosphor&quot;,&quot;images&quot;:[&quot;assets/img/testbench-phosphor1.png&quot;]}" data-index="0" aria-label="View Phosphor screenshot 1 of 1"><img src="assets/img/testbench-phosphor1.png" alt="Phosphor screenshot 1" loading="lazy"></button></div>
 </article>
-<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">04</span>
-    <h2 class="display">Striker</h2>
-    <p class="bench-blurb">Batch Mogrt exports so you don&#39;t have to wait. No endless modals to approve, just select the ones you want and export. Grab a cup of coffee and come back to your pile of Mogrts. Re-import mogrts into your current AE project, and preview animated thumbnails of mogrts you&#39;ve exported. Honestly, all the mogrt features that After Effects should ship natively.</p>
-    
-    <p class="bench-count mono">03 screens &mdash; click to enlarge</p>
-  </div>
-<div class="bench-media">
-  <button class="bench-shot" type="button"
-    data-bench="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="0"
-    aria-label="View Striker screenshot 1 of 3">
-    <img src="assets/img/testbench-striker1.png" alt="Striker screenshot 1" loading="lazy">
-  </button>
-  <div class="bench-thumbs">
-  <button class="bench-thumb" type="button"
-    data-bench="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="1"
-    aria-label="View Striker screenshot 2 of 3">
-    <img src="assets/img/testbench-striker2.png" alt="Striker screenshot 2" loading="lazy">
-  </button>
-  <button class="bench-thumb" type="button"
-    data-bench="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="2"
-    aria-label="View Striker screenshot 3 of 3">
-    <img src="assets/img/testbench-striker3.png" alt="Striker screenshot 3" loading="lazy">
-  </button>
-</div>
-</div>
+<article class="bench rise">
+  <div class="box info"><span class="num mono">04</span><h2>Striker</h2><p>Batch Mogrt exports so you don&#39;t have to wait. No endless modals to approve, just select the ones you want and export. Grab a cup of coffee and come back to your pile of Mogrts. Re-import mogrts into your current AE project, and preview animated thumbnails of mogrts you&#39;ve exported. Honestly, all the mogrt features that After Effects should ship natively.</p></div>
+  <div class="shots"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="0" aria-label="View Striker screenshot 1 of 3"><img src="assets/img/testbench-striker1.png" alt="Striker screenshot 1" loading="lazy"></button><div class="thumbs"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="1" aria-label="View Striker screenshot 2 of 3"><img src="assets/img/testbench-striker2.png" alt="Striker screenshot 2" loading="lazy"></button><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Striker&quot;,&quot;images&quot;:[&quot;assets/img/testbench-striker1.png&quot;,&quot;assets/img/testbench-striker2.png&quot;,&quot;assets/img/testbench-striker3.png&quot;]}" data-index="2" aria-label="View Striker screenshot 3 of 3"><img src="assets/img/testbench-striker3.png" alt="Striker screenshot 3" loading="lazy"></button></div></div>
 </article>
-<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">05</span>
-    <h2 class="display">Spark</h2>
-    <p class="bench-blurb">A YouTube Player panel for After Effects. Follow along with tutorials, adding notes and bookmarks that you can reference anytime. Save your favorite methods to reference with ease, or put on your favorite content creator as background noise as you get in the flow state.</p>
-    
-    <p class="bench-count mono">03 screens &mdash; click to enlarge</p>
-  </div>
-<div class="bench-media">
-  <button class="bench-shot" type="button"
-    data-bench="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="0"
-    aria-label="View Spark screenshot 1 of 3">
-    <img src="assets/img/testbench-spark1.png" alt="Spark screenshot 1" loading="lazy">
-  </button>
-  <div class="bench-thumbs">
-  <button class="bench-thumb" type="button"
-    data-bench="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="1"
-    aria-label="View Spark screenshot 2 of 3">
-    <img src="assets/img/testbench-spark2.png" alt="Spark screenshot 2" loading="lazy">
-  </button>
-  <button class="bench-thumb" type="button"
-    data-bench="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="2"
-    aria-label="View Spark screenshot 3 of 3">
-    <img src="assets/img/testbench-spark3.png" alt="Spark screenshot 3" loading="lazy">
-  </button>
-</div>
-</div>
+<article class="bench rise">
+  <div class="box info"><span class="num mono">05</span><h2>Spark</h2><p>A YouTube Player panel for After Effects. Follow along with tutorials, adding notes and bookmarks that you can reference anytime. Save your favorite methods to reference with ease, or put on your favorite content creator as background noise as you get in the flow state.</p></div>
+  <div class="shots"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="0" aria-label="View Spark screenshot 1 of 3"><img src="assets/img/testbench-spark1.png" alt="Spark screenshot 1" loading="lazy"></button><div class="thumbs"><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="1" aria-label="View Spark screenshot 2 of 3"><img src="assets/img/testbench-spark2.png" alt="Spark screenshot 2" loading="lazy"></button><button type="button" class="shot" data-item="{&quot;title&quot;:&quot;Spark&quot;,&quot;images&quot;:[&quot;assets/img/testbench-spark1.png&quot;,&quot;assets/img/testbench-spark2.png&quot;,&quot;assets/img/testbench-spark3.png&quot;]}" data-index="2" aria-label="View Spark screenshot 3 of 3"><img src="assets/img/testbench-spark3.png" alt="Spark screenshot 3" loading="lazy"></button></div></div>
 </article>
 </div>
-  </section>
 </main>
-
-<dialog class="lightbox benchbox" id="benchbox">
-  <div class="benchbox-inner">
-    <div class="lightbox-bar">
-      <h3></h3>
-      <span class="benchbox-counter mono"></span>
-      <button class="lightbox-close" type="button">Close</button>
-    </div>
-    <figure class="benchbox-stage">
-      <button class="benchbox-nav prev" type="button" aria-label="Previous screenshot">&larr;</button>
-      <img alt="">
-      <button class="benchbox-nav next" type="button" aria-label="Next screenshot">&rarr;</button>
-    </figure>
+<section class="grid">
+  <div class="box foot rise">
+    <h2>Let's connect and create <span>something.</span></h2>
+    <div class="acts"><a class="pill cta" href="mailto:jhanline@gmail.com?subject=Work%20Inquiry">Email me &nearr;</a><a class="pill" href="https://www.linkedin.com/in/jared-hanline/" target="_blank" rel="noopener">LinkedIn</a><a class="pill" href="https://www.instagram.com/jared.hanline" target="_blank" rel="noopener">Instagram</a></div>
   </div>
-</dialog>
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="footer-cta">
-      <h2>Let's connect and create <em>something.</em></h2>
-      <div class="footer-actions">
-        <a class="btn-accent" href="mailto:jhanline@gmail.com?subject=Work%20Inquiry">Email me</a>
-        <a class="plain" href="https://www.linkedin.com/in/jared-hanline/" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="plain" href="https://www.instagram.com/jared.hanline" target="_blank" rel="noopener">Instagram</a>
-      </div>
-    </div>
-    <div class="footer-base">
-      <span class="mono">&copy; 2026 Jared Hanline</span>
-      <span class="mono">jhanline@gmail.com</span>
-      <span class="mono">Charlotte, NC</span>
-    </div>
-  </div>
-</footer>
+  <div class="base mono"><span>&copy; 2026 Jared Hanline</span><span>jhanline@gmail.com</span><span>Charlotte, NC</span></div>
+</section>
+</div>
+<dialog class="look"><header><strong></strong><button class="pill on" type="button">Close &#10005;</button></header><div class="stack"></div></dialog>
 <script src="assets/js/site.js"></script>
 </body>
 </html>

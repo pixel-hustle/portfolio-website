@@ -5,39 +5,37 @@
  *   node build.js
  *
  * Outputs (repo root):
- *   index.html                      the Work page — featured carousel + every
- *                                   case study, filterable by tag (site entry)
- *   home.html                       landing (big section nav + about); the
- *                                   wordmark in the header leads here
- *   work.html                       redirect → index.html (keeps old links alive)
- *   testbench.html                  tools & software experiments (toggleable)
- *   archive.html                    smaller pieces, same filters (toggleable)
- *   project-<slug>.html             one per case study
- *   motion.html, design.html,       redirects for old links → the matching
- *   archive-motion/-design.html     filter on work.html / archive.html
+ *   index.html                 the Work page: statement, reel, and one grid of
+ *                              every project — case studies, quick-look pieces
+ *                              and the logo wall — with filters. Also holds
+ *                              the About card. This is the site's entry.
+ *   project-<slug>.html        one per case study
+ *   logos.html                 the logo wall (when it has logos)
+ *   testbench.html             tools & software experiments (toggleable)
+ *   home.html, work.html, archive.html, motion.html, design.html,
+ *   archive-motion.html, archive-design.html
+ *                              redirects, so every older link still lands
  *
- * No dependencies — plain Node.
+ * No dependencies — plain Node. The previous (editorial) design and its
+ * generator are kept at the git tag `v2-live`; the data file is unchanged
+ * in shape, so that version still builds from it.
  */
 
 const fs = require("fs");
 const path = require("path");
 
 const ROOT = __dirname;
-const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "data.json"), "utf8"));
-const { site, caseStudies, archive, about } = data;
-const sections = data.sections;
+const d = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "data.json"), "utf8"));
+const { site, about } = d;
+const sections = d.sections;
 const work = sections.work;
-// the filter buttons on the Work + Archive pages; items opt in via their `tags`
-const filters = data.filters || [];
-const testbench = data.testbench || { enabled: false, items: [] };
-// older data files predate the editable Test Bench page text
+const filters = d.filters || [];
+const testbench = d.testbench || { enabled: false, items: [] };
 if (!sections.testbench)
-  sections.testbench = {
-    label: "Test Bench",
-    desc: "After Effects Extensions / Software Experiments",
-    heading: "Test Bench",
-    blurb: "",
-  };
+  sections.testbench = { label: "Test Bench", desc: "After Effects Extensions / Software Experiments", heading: "Test Bench", blurb: "" };
+
+const WORK_PAGE = "index.html";
+const LOGOS_PAGE = "logos.html";
 
 // ---------- helpers ----------
 
@@ -54,42 +52,41 @@ const pad = (n) => String(n).padStart(2, "0");
 // "&" and *word* render in the accent color; "|" forces a line break
 const accent = (s) =>
   esc(s)
-    .replace(/&amp;/g, "<em>&amp;</em>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/&amp;/g, "<span>&amp;</span>")
+    .replace(/\*([^*]+)\*/g, "<span>$1</span>")
     .replace(/\s*\|\s*/g, "<br>");
 
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(site.emailSubject || "")}`;
-
 const ytThumb = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-
-const playIcon = `<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`;
-
-const tagsOf = (item) => (item.tags || []).filter((t) => filters.some((f) => f.key === t));
-const liveCases = caseStudies.filter((p) => !p.hidden);
-const liveArchive = archive.filter((a) => !a.hidden);
-// the Work page is the site's front door, so it lives at index.html
-const WORK_PAGE = "index.html";
-const HOME_PAGE = "home.html";
-const workHref = (key) => (key ? `${WORK_PAGE}?filter=${encodeURIComponent(key)}` : WORK_PAGE);
-const MAX_FEATURED = 6; // carousel slides when projects are ticked "featured"
-const FALLBACK_FEATURED = 5; // …and when none are: the first few case studies
-const hasFilter = (key) => filters.some((f) => f.key === key);
-
-// safe to drop inside <script type="application/json">
 const jsonScript = (obj) => JSON.stringify(obj).replace(/</g, "\\u003c");
+const item = (obj) => esc(JSON.stringify(obj));
 
-function videoFacade(id, label, poster) {
-  return `<div class="video-embed">
-  <button class="video-facade" data-video="${esc(id)}" aria-label="Play: ${esc(label)}">
-    <img src="${esc(poster || ytThumb(id))}" alt="" loading="lazy">
-    ${playIcon}
-  </button>
-</div>`;
-}
+const hasFilter = (key) => filters.some((f) => f.key === key);
+const tagsOf = (x) => (x.tags || []).filter(hasFilter);
+const label = (key) => (filters.find((f) => f.key === key) || {}).label || key;
+const workHref = (key) => (key ? `${WORK_PAGE}?filter=${encodeURIComponent(key)}` : WORK_PAGE);
+
+const cases = d.caseStudies.filter((p) => !p.hidden);
+const arch = d.archive.filter((a) => !a.hidden);
+const bench = testbench.enabled ? testbench.items || [] : [];
+
+// The logo wall is one project on the Work grid that opens a page of marks.
+// Pieces a logo links to are reached through the wall, so they give up their
+// own box on the grid.
+const logos = d.logos && d.logos.enabled !== false && (d.logos.items || []).length ? d.logos : null;
+const viaWall = new Set(logos ? logos.items.map((l) => l.link).filter(Boolean) : []);
+const gridArch = arch.filter((a) => !viaWall.has(a.id));
+
+// a mark is drawn as a mask, so one file takes the page's ink colour in light
+// and dark alike (SVG, or any image with transparency)
+const mark = (l, withColor) =>
+  `<span class="mark" style="--m:url('${esc(l.mono)}')" role="img" aria-label="${esc(l.name)}"></span>${
+    withColor && l.color ? `<img class="full" src="${esc(l.color)}" alt="" loading="lazy">` : ""
+  }`;
 
 // ---------- shared shell ----------
 
-function head(title, description, image, bodyClass) {
+function head(title, description, image) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,285 +100,260 @@ ${image ? `<meta property="og:image" content="${esc(image)}">` : ""}
 <link rel="icon" href="assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders:opsz,wght@10..72,700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>document.documentElement.classList.add("js")</script>
 </head>
-<body${bodyClass ? ` class="${bodyClass}"` : ""}>
-<script src="assets/js/transition.js"></script>`;
+<body>
+<div class="page">`;
 }
 
 function nav(active) {
-  const link = (href, label, key) =>
-    `<a href="${href}"${active === key ? ' aria-current="page"' : ""}>${label}</a>`;
-  // the landing page is the navigation — its header is just the wordmark
-  const links =
-    active === "home"
-      ? ""
-      : `
-    <nav class="site-nav" aria-label="Main">
-      ${link(WORK_PAGE, esc(work.label), "work")}
-      ${testbench.enabled ? link("testbench.html", esc(sections.testbench.label), "testbench") : ""}
-    </nav>`;
-  return `<header class="site-header">
-  <div class="wrap">
-    <a class="wordmark" href="${HOME_PAGE}">Jared Hanline<span>.</span></a>${links}
-  </div>
+  const link = (href, text, key) => `<a class="pill${active === key ? " on" : ""}" href="${href}"${active === key ? ' aria-current="page"' : ""}>${text}</a>`;
+  return `<header class="bar">
+  <a href="${WORK_PAGE}"><b>${esc(site.name)}<i>.</i></b></a>
+  <nav class="pills" aria-label="Main">
+    ${link(WORK_PAGE, esc(work.label || "Work"), "work")}
+    ${testbench.enabled ? link("testbench.html", esc(sections.testbench.label), "testbench") : ""}
+    ${link(`${WORK_PAGE}#about`, "About", "about")}
+    <a class="pill cta" href="${mailto}">Let's talk &nearr;</a>
+  </nav>
 </header>`;
 }
 
 function footer() {
   const socials = site.social
-    .map((s) => `<a class="plain" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`)
-    .join("\n      ");
-  return `<footer class="site-footer">
-  <div class="wrap">
-    <div class="footer-cta">
-      <h2>Let's connect and create <em>something.</em></h2>
-      <div class="footer-actions">
-        <a class="btn-accent" href="${mailto}">Email me</a>
-        ${socials}
-      </div>
-    </div>
-    <div class="footer-base">
-      <span class="mono">&copy; ${new Date().getFullYear()} ${esc(site.name)}</span>
-      <span class="mono">${esc(site.email)}</span>
-      <span class="mono">Charlotte, NC</span>
-    </div>
+    .map((s) => `<a class="pill" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`)
+    .join("");
+  return `<section class="grid">
+  <div class="box foot rise">
+    <h2>Let's connect and create <span>something.</span></h2>
+    <div class="acts"><a class="pill cta" href="${mailto}">Email me &nearr;</a>${socials}</div>
   </div>
-</footer>
+  <div class="base mono"><span>&copy; ${new Date().getFullYear()} ${esc(site.name)}</span><span>${esc(site.email)}</span><span>Charlotte, NC</span></div>
+</section>
+</div>
+<dialog class="look"><header><strong></strong><button class="pill on" type="button">Close &#10005;</button></header><div class="stack"></div></dialog>
 <script src="assets/js/site.js"></script>
 </body>
 </html>`;
 }
 
-// ---------- shared fragments ----------
-
-function workGrid(list) {
-  return list
-    .map(
-      (p, i) => `<article class="work-card" data-tags="${esc(tagsOf(p).join(" "))}" style="view-transition-name:card-${esc(p.slug)}">
-  <a href="project-${esc(p.slug)}.html">
-    <figure>
-      <img src="${esc(p.thumb)}" alt="${esc(p.title)}" loading="${i < 2 ? "eager" : "lazy"}">
-      ${p.thumbHover ? `<img class="thumb-hover" src="${esc(p.thumbHover)}" alt="" loading="lazy">` : ""}
-    </figure>
-    <div class="title-row">
-      <span class="num">${pad(i + 1)}</span>
-      <h3>${esc(p.title)}</h3>
-      <span class="arrow" aria-hidden="true">&rarr;</span>
-    </div>
-    <p class="meta">${esc(p.client)} &middot; ${esc(p.discipline)}</p>
-  </a>
-</article>`
-    )
-    .join("\n");
-}
-
-// per-filter counts let site.js keep the teaser honest as filters change
-function archiveTeaser() {
-  const counts = { all: liveArchive.length };
-  filters.forEach((f) => (counts[f.key] = liveArchive.filter((a) => tagsOf(a).includes(f.key)).length));
-  return `<div class="archive-teaser" data-archive-teaser="${esc(JSON.stringify(counts))}">
-      <a href="archive.html">
-        <span class="display">The Archive</span>
-        <span class="mono"><span data-archive-count>${liveArchive.length}</span> more pieces beyond the case studies</span>
-        <span class="arrow" aria-hidden="true">&rarr;</span>
-      </a>
-    </div>`;
-}
-
-// "All" plus one button per filter that has something in it. Without JS
-// every item simply stays visible.
-function filterBar(list, label) {
-  const count = (key) => list.filter((x) => tagsOf(x).includes(key)).length;
-  const btn = (key, name, n) =>
-    `<button type="button" class="filter-btn" data-filter="${esc(key)}" aria-pressed="${key === "all"}">${esc(name)}<span class="count">${pad(n)}</span></button>`;
-  const buttons = filters.filter((f) => count(f.key)).map((f) => btn(f.key, f.label, count(f.key)));
-  if (!buttons.length) return "";
-  return `<div class="filter-bar" role="group" aria-label="${esc(label)}">
-    ${btn("all", "All", list.length)}
-    ${buttons.join("\n    ")}
-  </div>`;
-}
-
-// The rotating carousel that opens the Work page. Projects opt in with
-// `featured`; with none ticked, the first few case studies stand in.
-// Slide 1 is fully usable without JS; site.js adds rotation + controls.
-function showcase() {
-  if (work.showCarousel === false) return "";
-  const usable = liveCases.filter((p) => p.carouselImage || p.thumb);
-  let picks = usable.filter((p) => p.featured).slice(0, MAX_FEATURED);
-  if (!picks.length) picks = usable.slice(0, FALLBACK_FEATURED);
-  if (!picks.length) return "";
-  const total = picks.length;
-
-  const slides = picks
-    .map(
-      (p, i) => `<a class="showcase-slide${i === 0 ? " is-active" : ""}" href="project-${esc(p.slug)}.html" data-slide
-      aria-roledescription="slide" aria-label="${i + 1} of ${total}: ${esc(p.title)}">
-      <div class="showcase-text">
-        <div class="showcase-title">
-          <p class="showcase-kicker mono">Featured</p>
-          <h2 class="display">${esc(p.title)}</h2>
-          <p class="showcase-meta mono">${esc(p.client)} &middot; ${esc(p.discipline)}</p>
-        </div>
-        <span class="showcase-cta mono">View case study <span class="arrow" aria-hidden="true">&rarr;</span></span>
-      </div>
-      <figure><img src="${esc(p.carouselImage || p.thumb)}" alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}></figure>
-    </a>`
-    )
-    .join("\n    ");
-
-  const ticks = picks
-    .map(
-      (p, i) => `<button type="button" class="showcase-tick${i === 0 ? " is-active" : ""}" data-go="${i}"${i === 0 ? ' aria-current="true"' : ""} aria-label="Show ${esc(p.title)} (${i + 1} of ${total})">
-        <span class="bar"><i></i></span>
-      </button>`
-    )
-    .join("\n      ");
-
-  // the controls sit in the stage's own grid cell, so they overlay the image
-  return `  <section class="showcase wrap" data-showcase aria-roledescription="carousel" aria-label="Featured projects">
-    <div class="showcase-stage">
-    ${slides}
-    ${
-      total > 1
-        ? `<div class="showcase-controls">
-      <div class="showcase-overlay">
-        <button type="button" class="showcase-btn prev" data-prev aria-label="Previous project">&larr;</button>
-        <button type="button" class="showcase-btn next" data-next aria-label="Next project">&rarr;</button>
-        <div class="showcase-bar">
-          <div class="showcase-ticks">
-      ${ticks}
-          </div>
-          <button type="button" class="showcase-pause mono" data-pause aria-label="Pause rotation">Pause</button>
-        </div>
-      </div>
-    </div>`
-        : ""
-    }
-    </div>
-  </section>
-`;
-}
-
-// ---------- landing ----------
-
-function buildLanding() {
-  const rows = [{ href: WORK_PAGE, label: work.label, desc: work.desc || "" }];
-  if (testbench.enabled) {
-    rows.push({
-      href: "testbench.html",
-      label: sections.testbench.label,
-      desc: sections.testbench.desc,
-    });
-  }
-
-  const rowsHtml = rows
-    .map(
-      (r, i) => `<a class="land-row" href="${r.href}">
-      <span class="num mono">${pad(i + 1)}</span>
-      <h2 class="display">${accent(r.label)}</h2>
-      <span class="desc mono">${esc(r.desc)}</span>
-      <span class="arrow" aria-hidden="true">&rarr;</span>
-    </a>`
-    )
-    .join("\n");
-
-  return `${head(site.title, site.tagline, site.reelPoster)}
-${nav("home")}
-<main>
-  <div class="land-hero">
-    <section class="land-masthead wrap">
-      <h1 class="display">${accent(site.headline || site.role)}</h1>
-    </section>
-
-    <nav class="land-rows wrap" aria-label="Sections">
-${rowsHtml}
-    </nav>
-  </div>
-
-  <section class="section wrap" id="about">
-    <div class="section-head">
-      <h2>About Me</h2>
-      <span class="mono">Charlotte, NC</span>
-    </div>
-    <div class="about-intro">
-      <p class="lede">${esc(about.intro)}</p>
-      <figure class="about-portrait">
-        <img src="${esc(about.portrait)}" alt="Portrait of ${esc(site.name)}" loading="lazy">
-      </figure>
-      <div class="about-actions">
-        <a class="btn-accent" href="${mailto}">Email me</a>
-      </div>
-    </div>
-  </section>
-</main>
-${footer()}`;
-}
-
 // ---------- work page ----------
 
+const meta = (x, extra) => [extra, ...tagsOf(x).map(label)].filter(Boolean).map(esc).join(" &middot; ");
+
+const caseCard = (p, size) => `<a class="card" href="project-${esc(p.slug)}.html" data-kind="case" data-size="${esc(size)}" data-tags="${esc(tagsOf(p).join(" "))}">
+  <div class="im"><img src="${esc(p.thumb)}" alt="" loading="lazy">${p.thumbHover ? `<img class="hov" src="${esc(p.thumbHover)}" alt="" loading="lazy">` : ""}</div>
+  <span class="kind mono">Case study</span>
+  <div class="cap"><strong>${esc(p.title)}</strong><span class="mono">${esc(p.client)} &middot; ${esc(p.discipline)}</span></div></a>`;
+
+const pieceCard = (a, size) => `<button type="button" class="card piece" data-kind="piece" data-size="${esc(size)}" data-tags="${esc(tagsOf(a).join(" "))}" data-item="${item({ title: a.title, video: a.video, images: a.images })}">
+  <div class="im"><img src="${esc(a.thumb)}" alt="" loading="lazy"></div>
+  <span class="kind mono">${a.video ? "&#9654; Video" : "Stills"}</span>
+  <div class="cap"><strong>${esc(a.title)}</strong><span class="mono">${meta(a, a.video ? "Video" : "Stills")}</span></div></button>`;
+
+// a 3 × 3 sheet of marks: the first three logos sit whole in the middle row,
+// the rest fill the cut-off rows above and below (repeating if there are few)
+const wallCard = (size) => `<a class="card wall" href="${LOGOS_PAGE}" data-kind="case" data-size="${esc(size)}" data-tags="${esc(tagsOf(logos).join(" "))}">
+  <div class="marks">${[3, 4, 5, 0, 1, 2, 6, 7, 8]
+    .map((n) => logos.items[n % logos.items.length])
+    .map((l) => `<span>${mark(l)}</span>`)
+    .join("")}</div>
+  <span class="kind mono">${pad(logos.items.length)} logos</span>
+  <div class="cap"><strong>${esc(logos.title)}</strong></div></a>`;
+
+// Order and size come from the CMS (Work Grid tab): data.workOrder lists item
+// ids, and each item may carry its own "size". Until an order is saved, the
+// same starter rhythm the CMS seeds is used: a case study, then a couple of
+// smaller pieces. Auto size = Large for case studies and the logo wall,
+// Small for quick looks; the grid's dense flow packs whatever results.
+function workSequence() {
+  const tagged = [
+    ...cases.map((x) => ({ kind: "case", item: x })),
+    ...gridArch.map((x) => ({ kind: "piece", item: x })),
+    ...(logos ? [{ kind: "logos", item: logos }] : []),
+  ];
+  let ordered;
+  if (Array.isArray(d.workOrder) && d.workOrder.length) {
+    const byId = new Map(tagged.filter((x) => x.item.id).map((x) => [x.item.id, x]));
+    ordered = d.workOrder.map((id) => byId.get(id)).filter(Boolean);
+    tagged.forEach((x) => { if (!ordered.includes(x)) ordered.push(x); });
+  } else {
+    ordered = [];
+    const cs = tagged.filter((x) => x.kind === "case");
+    const ps = tagged.filter((x) => x.kind === "piece");
+    if (logos) ps.splice(Math.min(2, ps.length), 0, { kind: "logos", item: logos });
+    const per = cs.length ? Math.max(1, Math.floor(ps.length / cs.length)) : 0;
+    cs.forEach((c) => { ordered.push(c); ordered.push(...ps.splice(0, per)); });
+    ordered.push(...ps);
+  }
+  return ordered.map((x) =>
+    x.kind === "logos" ? wallCard(x.item.size || "large")
+    : x.kind === "case" ? caseCard(x.item, x.item.size || "large")
+    : pieceCard(x.item, x.item.size || "small")
+  );
+}
+
 function buildWork() {
-  const list = liveCases;
+  const all = [...cases, ...gridArch, ...(logos ? [logos] : [])];
+  const count = (k) => all.filter((x) => tagsOf(x).includes(k)).length;
+  const nCases = cases.length + (logos ? 1 : 0);
+  const fp = (k, name, n, on) => `<button type="button" class="fp" data-f="${esc(k)}" aria-pressed="${!!on}">${esc(name)}<sup>${pad(n)}</sup></button>`;
+  const pills = [fp("all", "All", all.length, true)];
+  if (nCases && nCases < all.length) pills.push(fp("cases", "Case studies", nCases));
+  filters.filter((f) => count(f.key)).forEach((f) => pills.push(fp(f.key, f.label, count(f.key))));
 
-  // each filter can bring its own header text (and the reel); blank falls
-  // back to the Work page's own header
-  const views = {
-    all: { heading: accent(work.heading || work.label), blurb: esc(work.blurb || ""), reel: !!work.showReel },
-  };
-  filters.forEach((f) => {
-    views[f.key] = f.heading
-      ? { heading: accent(f.heading), blurb: esc(f.blurb || ""), reel: !!f.showReel }
-      : { ...views.all, reel: !!f.showReel };
-  });
+  // each filter can bring its own header text; blank falls back to the page's own
+  const views = { all: { heading: accent(work.heading || work.label), blurb: work.blurb || "" } };
+  filters.forEach((f) => { if (f.heading) views[f.key] = { heading: accent(f.heading), blurb: f.blurb || "" }; });
+
   const reel = site.reelVideo && (work.showReel || filters.some((f) => f.showReel));
+  const full = reel ? "" : " full";
+  const tool = bench[0];
+  const benchCard = tool
+    ? `<a class="box tri dark rise" href="testbench.html" style="flex-direction:row;align-items:stretch"><div style="flex:1;display:flex;flex-direction:column;justify-content:space-between"><div><span class="mono">${esc(sections.testbench.label)}</span><h3 style="margin-top:10px">${esc(tool.name)}${bench.length > 1 ? ` + ${bench.length - 1} more tool${bench.length > 2 ? "s" : ""}` : ""}</h3><p style="margin-top:8px">${esc(sections.testbench.desc)}</p></div><span class="mono">Open the bench &rarr;</span></div>${
+        (tool.images || [])[0] ? `<div class="shot" style="flex:1.2;align-self:center"><img src="${esc(tool.images[0])}" alt="" loading="lazy"></div>` : ""
+      }</a>`
+    : "";
 
-  // this is the page visitors land on, so it carries the site's own title
   return `${head(site.title, site.tagline, site.reelPoster)}
 ${nav("work")}
-<main data-filter-scope>
-  <script type="application/json" data-filter-views>${jsonScript(views)}</script>
-${showcase()}
-  <!-- no kicker here: the filter buttons already say where you are -->
-  <header class="page-head wrap">
-    <h1 class="display">${views.all.heading}</h1>
-    <p class="blurb">${views.all.blurb}</p>
-  </header>
-
-  <div class="wrap filter-row">
-  ${filterBar(list, "Filter case studies")}
-  </div>
-${
-  reel
-    ? `
-  <section class="section wrap" id="reel" data-reel${work.showReel ? "" : " hidden"}>
-    <div class="section-head">
-      <h2>Motion Reel</h2>
-      <span class="mono">The star of the show</span>
-    </div>
-    ${videoFacade(site.reelVideo, "Motion reel", site.reelPoster)}
-  </section>
-`
-    : ""
-}
-  <section class="section wrap" id="work">
-    <div class="section-head">
-      <h2>Case Studies</h2>
-      <span class="mono" data-filter-count>${pad(list.length)}</span>
-    </div>
-    <div class="work-grid">
-${workGrid(list)}
-    </div>
-    <p class="filter-empty" hidden>Nothing here yet &mdash; check back soon.</p>
-    ${work.archiveEnabled ? archiveTeaser() : ""}
-  </section>
+<main>
+<script type="application/json" data-views>${jsonScript(views)}</script>
+<div class="grid">
+  <section class="box state${full}"><div><h1 class="big">${views.all.heading}</h1><p class="quip">${esc(views.all.blurb)}</p></div>
+    <p class="intro">${esc(site.tagline)}</p></section>
+  <div class="label filters${full}" id="work"><h2>${esc(work.label || "Work")}</h2><div class="fpills" role="group" aria-label="Filter projects">${pills.join("")}</div></div>
+  ${
+    reel
+      ? `<div class="side solo"><button type="button" class="box reel" data-item="${item({ title: "Motion reel", video: site.reelVideo })}" aria-label="Play the motion reel"><img src="${esc(site.reelPoster || ytThumb(site.reelVideo))}" alt=""><span class="chip"><i>&#9654;</i> Play the motion reel</span></button></div>`
+      : ""
+  }
+</div>
+<div class="workwrap"><div class="work" data-work>
+  ${workSequence().join("\n  ")}
+</div></div>
+<section class="grid">
+  <div class="label" id="about"><h2>About</h2><span class="mono">Charlotte, NC</span></div>
+  ${benchCard}
+  <div class="box tri about rise${benchCard ? "" : " wide"}"><div class="ph"><img src="${esc(about.portrait)}" alt="Portrait of ${esc(site.name)}" loading="lazy"></div><div class="tx"><p>${esc(about.intro)}</p><a class="pill cta" href="${mailto}" style="align-self:flex-start">Email me &nearr;</a></div></div>
+</section>
 </main>
 ${footer()}`;
 }
 
-// old section URLs stay alive as redirects to the matching filter
-function redirectPage(to, keepQuery) {
+// ---------- logo wall ----------
+
+function buildLogos() {
+  const target = (id) => arch.find((a) => a.id === id) || cases.find((c) => c.id === id || c.slug === id);
+  const tile = (l) => {
+    const t = l.link && target(l.link);
+    const inner = `<div class="art">${mark(l, true)}</div><div class="nm mono"><span>${esc(l.name)}</span>${t ? "<b>View project &nearr;</b>" : ""}</div>`;
+    const cls = `logo rise${l.color ? " has-full" : ""}`;
+    if (t && t.slug) return `<a class="${cls}" href="project-${esc(t.slug)}.html">${inner}</a>`;
+    if (t) return `<button type="button" class="${cls}" data-item="${item({ title: t.title, video: t.video, images: t.images })}">${inner}</button>`;
+    return `<div class="${cls}">${inner}</div>`;
+  };
+  return `${head(`${logos.title} — ${site.name}`, logos.intro || `Logo design by ${site.name}.`)}
+${nav("work")}
+<main>
+<div class="grid">
+  <section class="box wallhead"><div><a class="mono backlink" href="${WORK_PAGE}#work" data-back-work style="display:block;margin-bottom:18px">&larr; All work</a><h1>${esc(logos.title)}</h1></div><p>${esc(logos.intro || "")}</p></section>
+</div>
+<div class="wall-grid">
+  ${logos.items.map(tile).join("\n  ")}
+</div>
+</main>
+${footer()}`;
+}
+
+// ---------- test bench ----------
+
+function buildTestbench() {
+  const tb = sections.testbench;
+  const items = testbench.items || [];
+  const entries = items
+    .map((t, i) => {
+      const shots = (t.images && t.images.length ? t.images : [t.image]).filter(Boolean);
+      const payload = item({ title: t.name, images: shots });
+      const shot = (src, n) => `<button type="button" class="shot" data-item="${payload}" data-index="${n}" aria-label="View ${esc(t.name)} screenshot ${n + 1} of ${shots.length}"><img src="${esc(src)}" alt="${esc(t.name)} screenshot ${n + 1}" loading="lazy"></button>`;
+      // no link yet → no button at all
+      const action =
+        t.link && t.link.url
+          ? t.link.type === "download"
+            ? `<a class="pill cta" href="${esc(t.link.url)}" download>Get this &darr;</a>`
+            : `<a class="pill cta" href="${esc(t.link.url)}" target="_blank" rel="noopener">Try it &nearr;</a>`
+          : "";
+      return `<article class="bench rise">
+  <div class="box info"><span class="num mono">${pad(i + 1)}</span><h2>${esc(t.name)}</h2><p>${esc(t.blurb || "")}</p>${action}</div>
+  <div class="shots">${shots.length ? shot(shots[0], 0) : ""}${
+        shots.length > 1 ? `<div class="thumbs">${shots.slice(1).map((s, n) => shot(s, n + 1)).join("")}</div>` : ""
+      }</div>
+</article>`;
+    })
+    .join("\n");
+
+  return `${head(`${tb.label} — ${site.name}`, tb.blurb || `${tb.desc} by ${site.name}.`)}
+${nav("testbench")}
+<main>
+<div class="grid">
+  <section class="box wallhead"><div><h1 class="big">${accent(tb.heading || tb.label)}</h1></div><p>${esc(tb.blurb || tb.desc || "")}</p></section>
+  ${items.length ? entries : `<p class="box empty">Tools are being loaded onto the bench &mdash; check back soon.</p>`}
+</div>
+</main>
+${footer()}`;
+}
+
+// ---------- case study pages ----------
+
+// text sections become cards; a run of images shows the first full width and
+// the rest in pairs (an odd one out goes full width); videos are full width
+function projectBlocks(p) {
+  const out = [];
+  let run = [];
+  const flush = () => {
+    run.forEach((b, i) => {
+      const fullWidth = i === 0 || ((run.length - 1) % 2 === 1 && i === run.length - 1);
+      out.push(`<figure class="media ${fullWidth ? "m12" : "m6"} rise"><img src="${esc(b.src)}" alt="${esc(b.caption || p.title)}" loading="lazy">${b.caption ? `<figcaption class="mono">${esc(b.caption)}</figcaption>` : ""}</figure>`);
+    });
+    run = [];
+  };
+  for (const b of p.blocks || []) {
+    if (b.type === "image" && b.src) { run.push(b); continue; }
+    flush();
+    if (b.type === "text") {
+      out.push(`<section class="box text rise"><h2 class="mono">${esc(b.heading)}</h2><div>${(b.body || []).map((t) => `<p>${esc(t)}</p>`).join("")}</div></section>`);
+    } else if (b.type === "video" && b.id) {
+      out.push(`<figure class="media m12 rise"><div class="vid"><button type="button" data-video="${esc(b.id)}" aria-label="Play: ${esc(b.caption || p.title)}"><img src="https://i.ytimg.com/vi/${esc(b.id)}/maxresdefault.jpg" alt="" loading="lazy" onload="if(this.naturalWidth<=120)this.src='${esc(ytThumb(b.id))}'"><i>&#9654;</i></button></div>${b.caption ? `<figcaption class="mono">${esc(b.caption)}</figcaption>` : ""}</figure>`);
+    }
+  }
+  flush();
+  return out.join("\n  ");
+}
+
+function buildProject(p) {
+  const i = cases.findIndex((x) => x.slug === p.slug);
+  const prev = cases[(i - 1 + cases.length) % cases.length] || p;
+  const next = cases[(i + 1) % cases.length] || p;
+  const role = (p.credits && p.credits[0] ? p.credits[0].split(":")[0] : "Art Direction").trim();
+  const pn = (q, text) => `<a class="box pn rise" href="project-${esc(q.slug)}.html">${q.thumb ? `<div class="ph"><img src="${esc(q.thumb)}" alt="" loading="lazy"></div>` : ""}<div class="tx"><span class="mono">${text}</span><strong>${esc(q.title)}</strong></div></a>`;
+
+  return `${head(`${p.title} — ${site.name}`, `${p.title} · ${p.client} · ${p.discipline}`, p.hero)}
+${nav("work")}
+<main class="grid">
+  <section class="box title"><a class="mono backlink" href="${WORK_PAGE}#work" data-back-work>&larr; All work</a><h1>${esc(p.title)}</h1></section>
+  <div class="facts"><div class="box fact"><span class="mono">Client</span><strong>${esc(p.client)}</strong></div><div class="box fact"><span class="mono">Discipline</span><strong>${esc(p.discipline)}</strong></div><div class="box fact hot"><span class="mono">Role</span><strong>${esc(role)}</strong></div></div>
+  ${p.hero ? `<figure class="media hero"><img src="${esc(p.hero)}" alt="${esc(p.title)}"></figure>` : ""}
+  ${projectBlocks(p)}
+  <section class="box credits rise"><span class="mono">Credits</span><ul>${(p.credits || []).map((c) => `<li>${esc(c)}</li>`).join("")}</ul></section>
+  ${pn(prev, "&larr; Previous")}${pn(next, "Next &rarr;")}
+</main>
+${footer()}`;
+}
+
+// older URLs stay alive as redirects (keeping any ?filter= and #hash)
+function redirectPage(to) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -390,217 +362,11 @@ function redirectPage(to, keepQuery) {
 <meta name="robots" content="noindex">
 <link rel="canonical" href="${esc(to)}">
 <meta http-equiv="refresh" content="0; url=${esc(to)}">
-<script>location.replace(${JSON.stringify(to)} + ${keepQuery ? "location.search + " : ""}location.hash)</script>
+<script>location.replace(${JSON.stringify(to)} + (${JSON.stringify(to)}.indexOf("?") < 0 && ${JSON.stringify(to)}.indexOf("#") < 0 ? location.search + location.hash : ""))</script>
 </head>
 <body><a href="${esc(to)}">Continue</a></body>
 </html>
 `;
-}
-
-// ---------- test bench ----------
-
-function buildTestbench() {
-  const items = testbench.items || [];
-
-  // one gallery per tool: image 1 leads, the rest support. Both are lightboxed.
-  const entries = items
-    .map((t, i) => {
-      const shots = (t.images && t.images.length ? t.images : [t.image]).filter(Boolean);
-      const payload = esc(JSON.stringify({ title: t.name, images: shots }));
-
-      const shot = (src, n, cls) => `<button class="${cls}" type="button"
-    data-bench="${payload}" data-index="${n}"
-    aria-label="View ${esc(t.name)} screenshot ${n + 1} of ${shots.length}">
-    <img src="${esc(src)}" alt="${esc(t.name)} screenshot ${n + 1}" loading="${i === 0 && n === 0 ? "eager" : "lazy"}">
-  </button>`;
-
-      const support = shots.slice(1);
-      const media = shots.length
-        ? `<div class="bench-media">
-  ${shot(shots[0], 0, "bench-shot")}
-  ${support.length ? `<div class="bench-thumbs">\n  ${support.map((src, n) => shot(src, n + 1, "bench-thumb")).join("\n  ")}\n</div>` : ""}
-</div>`
-        : "";
-
-      // no link yet → no button at all
-      const action =
-        t.link && t.link.url
-          ? t.link.type === "download"
-            ? `<a class="bench-link" href="${esc(t.link.url)}" download>Get This &darr;</a>`
-            : `<a class="bench-link" href="${esc(t.link.url)}" target="_blank" rel="noopener">Try it &nearr;</a>`
-          : "";
-
-      return `<article class="bench-entry">
-  <div class="bench-info">
-    <span class="num mono">${pad(i + 1)}</span>
-    <h2 class="display">${esc(t.name)}</h2>
-    <p class="bench-blurb">${esc(t.blurb || "")}</p>
-    ${action}
-    ${shots.length > 1 ? `<p class="bench-count mono">${pad(shots.length)} screens &mdash; click to enlarge</p>` : ""}
-  </div>
-${media}
-</article>`;
-    })
-    .join("\n");
-
-  const empty = `<p class="bench-empty">Tools are being loaded onto the bench &mdash; check back soon.</p>`;
-
-  const tb = sections.testbench;
-  return `${head(`${tb.label} — ${site.name}`, tb.blurb || `${tb.desc} by ${site.name}.`)}
-${nav("testbench")}
-<main>
-  <header class="page-head wrap">
-    <p class="kicker mono">${esc(tb.label)}</p>
-    <h1 class="display">${accent(tb.heading || tb.label)}</h1>
-    <p class="blurb">${esc(tb.blurb || "")}</p>
-  </header>
-  <section class="section wrap" style="padding-top:0">
-    ${items.length ? `<div class="bench-list">\n${entries}\n</div>` : empty}
-  </section>
-</main>
-
-<dialog class="lightbox benchbox" id="benchbox">
-  <div class="benchbox-inner">
-    <div class="lightbox-bar">
-      <h3></h3>
-      <span class="benchbox-counter mono"></span>
-      <button class="lightbox-close" type="button">Close</button>
-    </div>
-    <figure class="benchbox-stage">
-      <button class="benchbox-nav prev" type="button" aria-label="Previous screenshot">&larr;</button>
-      <img alt="">
-      <button class="benchbox-nav next" type="button" aria-label="Next screenshot">&rarr;</button>
-    </figure>
-  </div>
-</dialog>
-${footer()}`;
-}
-
-// ---------- project pages ----------
-
-// consecutive image/video blocks share one media stack; a text block ends it
-function projectBlocks(p) {
-  const out = [];
-  let media = [];
-  const flush = () => {
-    if (media.length) out.push(`  <div class="project-media">\n${media.join("\n")}\n  </div>`);
-    media = [];
-  };
-  for (const b of p.blocks || []) {
-    const caption = b.caption ? `\n  <figcaption class="media-caption">${esc(b.caption)}</figcaption>` : "";
-    if (b.type === "text") {
-      flush();
-      out.push(`<section class="project-section">
-  <h2>${esc(b.heading)}</h2>
-  <div class="body">
-    ${(b.body || []).map((par) => `<p>${esc(par)}</p>`).join("\n    ")}
-  </div>
-</section>`);
-    } else if (b.type === "image" && b.src) {
-      media.push(`<figure><img src="${esc(b.src)}" alt="${esc(b.caption || p.title)}" loading="lazy">${caption}</figure>`);
-    } else if (b.type === "video" && b.id) {
-      media.push(`<figure>
-  ${videoFacade(b.id, b.caption || p.title)}${caption}
-</figure>`);
-    }
-  }
-  flush();
-  return out.join("\n");
-}
-
-const navThumb = (p) => (p.thumb ? `<img src="${esc(p.thumb)}" alt="" loading="lazy">` : "");
-
-function buildProject(p) {
-  const i = liveCases.findIndex((x) => x.slug === p.slug);
-  const prev = liveCases[(i - 1 + liveCases.length) % liveCases.length] || p;
-  const next = liveCases[(i + 1) % liveCases.length] || p;
-
-  const credits = (p.credits || []).map((c) => `<li>${esc(c)}</li>`).join("\n      ");
-
-  return `${head(`${p.title} — ${site.name}`, `${p.title} · ${p.client} · ${p.discipline}`, p.hero, "page-project")}
-${nav("work")}
-<main class="wrap">
-  <a class="back-link mono" href="${WORK_PAGE}#work" data-back-work>&larr; ${esc(work.label)}</a>
-  <header class="project-head">
-    <h1 class="display">${esc(p.title)}</h1>
-    <dl class="project-meta">
-      <div><dt>Client</dt><dd>${esc(p.client)}</dd></div>
-      <div><dt>Discipline</dt><dd>${esc(p.discipline)}</dd></div>
-      <div><dt>Role</dt><dd>${esc((p.credits && p.credits[0] ? p.credits[0].split(":")[0] : "Art Direction").trim())}</dd></div>
-    </dl>
-  </header>
-
-  ${p.hero ? `<figure class="project-hero"><img src="${esc(p.hero)}" alt="${esc(p.title)}"></figure>` : ""}
-
-${projectBlocks(p)}
-
-  <section class="project-credits">
-    <h2>Credits</h2>
-    <ul>
-      ${credits}
-    </ul>
-  </section>
-
-  <nav class="project-nav" aria-label="Project navigation">
-    <a class="prev" href="project-${esc(prev.slug)}.html">
-      ${navThumb(prev)}
-      <span class="label">
-        <span class="mono">&larr; Previous</span>
-        <span class="display">${esc(prev.title)}</span>
-      </span>
-    </a>
-    <a class="next" href="project-${esc(next.slug)}.html">
-      ${navThumb(next)}
-      <span class="label">
-        <span class="mono">Next &rarr;</span>
-        <span class="display">${esc(next.title)}</span>
-      </span>
-    </a>
-  </nav>
-</main>
-${footer()}`;
-}
-
-// ---------- archives ----------
-
-function buildArchive() {
-  const cards = liveArchive
-    .map((item) => {
-      const payload = esc(JSON.stringify({ title: item.title, video: item.video, images: item.images }));
-      const kind = item.video ? "Video" : "Stills";
-      return `<button class="archive-card" type="button" data-item="${payload}" data-tags="${esc(tagsOf(item).join(" "))}">
-  <figure><img src="${esc(item.thumb)}" alt="${esc(item.title)}" loading="lazy"></figure>
-  <h3>${esc(item.title)}</h3>
-  <p class="meta">${kind}</p>
-</button>`;
-    })
-    .join("\n");
-
-  return `${head(`Archive — ${site.name}`, `More branding, design, and motion work by ${site.name}.`)}
-${nav("work")}
-<main class="wrap" data-filter-scope>
-  <a class="back-link mono" href="${WORK_PAGE}#work" data-back-work>&larr; ${esc(work.label)}</a>
-  <header class="page-head">
-    <h1 class="display">The Archive</h1>
-    <p class="lede">Smaller pieces &mdash; logos, identities, IDs, and intros &mdash; that didn't need a full case study. Click any piece to view it.</p>
-  </header>
-  ${filterBar(liveArchive, "Filter archive")}
-  <div class="archive-grid">
-${cards}
-  </div>
-  <p class="filter-empty" hidden>Nothing here yet &mdash; check back soon.</p>
-</main>
-
-<dialog class="lightbox" id="lightbox">
-  <div class="lightbox-inner">
-    <div class="lightbox-bar">
-      <h3></h3>
-      <button class="lightbox-close" type="button">Close</button>
-    </div>
-    <div class="lightbox-media"></div>
-  </div>
-</dialog>
-${footer()}`;
 }
 
 // ---------- write everything ----------
@@ -612,20 +378,23 @@ function write(name, html) {
 
 console.log("Building site from data/data.json ...");
 
-const legacy = {
+const redirects = {
+  "home.html": `${WORK_PAGE}#about`,
+  "work.html": WORK_PAGE,
+  "archive.html": WORK_PAGE,
   "motion.html": workHref(hasFilter("motion") && "motion"),
   "design.html": workHref(hasFilter("design") && "design"),
-  "archive-motion.html": work.archiveEnabled ? `archive.html${hasFilter("motion") ? "?filter=motion" : ""}` : WORK_PAGE,
-  "archive-design.html": work.archiveEnabled ? `archive.html${hasFilter("design") ? "?filter=design" : ""}` : WORK_PAGE,
+  "archive-motion.html": workHref(hasFilter("motion") && "motion"),
+  "archive-design.html": workHref(hasFilter("design") && "design"),
 };
 
-const expected = new Set([WORK_PAGE, HOME_PAGE, "work.html", ...Object.keys(legacy)]);
+const expected = new Set([WORK_PAGE, ...Object.keys(redirects)]);
+if (logos) expected.add(LOGOS_PAGE);
 if (testbench.enabled) expected.add("testbench.html");
-if (work.archiveEnabled) expected.add("archive.html");
-liveCases.forEach((p) => expected.add(`project-${p.slug}.html`));
+cases.forEach((p) => expected.add(`project-${p.slug}.html`));
 
 // remove generated pages that shouldn't exist anymore
-const generated = /^(project-.*|home|about|archive|archive-motion|archive-design|motion|design|work|testbench)\.html$/;
+const generated = /^(project-.*|home|about|logos|archive|archive-motion|archive-design|motion|design|work|testbench)\.html$/;
 for (const f of fs.readdirSync(ROOT)) {
   if (generated.test(f) && !expected.has(f)) {
     fs.unlinkSync(path.join(ROOT, f));
@@ -634,12 +403,9 @@ for (const f of fs.readdirSync(ROOT)) {
 }
 
 write(WORK_PAGE, buildWork());
-write(HOME_PAGE, buildLanding());
-// the Work page used to live at work.html — old links (and their ?filter=) still land
-write("work.html", redirectPage(WORK_PAGE, true));
+if (logos) write(LOGOS_PAGE, buildLogos());
 if (testbench.enabled) write("testbench.html", buildTestbench());
-liveCases.forEach((p) => write(`project-${p.slug}.html`, buildProject(p)));
-if (work.archiveEnabled) write("archive.html", buildArchive());
-for (const [name, to] of Object.entries(legacy)) write(name, redirectPage(to));
+cases.forEach((p) => write(`project-${p.slug}.html`, buildProject(p)));
+for (const [name, to] of Object.entries(redirects)) write(name, redirectPage(to));
 
 console.log("Done.");

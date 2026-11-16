@@ -227,6 +227,8 @@ const ADMIN_HTML = /* html */ `<!DOCTYPE html>
   <div class="tabs">
     <button data-tab="cases" class="active" onclick="showTab('cases')">Case Studies</button>
     <button data-tab="archive" onclick="showTab('archive')">Archives</button>
+    <button data-tab="logos" onclick="showTab('logos')">Logos</button>
+    <button data-tab="grid" onclick="showTab('grid')">Work Grid</button>
     <button data-tab="work" onclick="showTab('work')">Work Page &amp; Filters</button>
     <button data-tab="bench" onclick="showTab('bench')">Test Bench</button>
     <button data-tab="about" onclick="showTab('about')">About &amp; Site</button>
@@ -383,6 +385,8 @@ function render() {
     label: 'Test Bench', desc: 'After Effects Extensions / Software Experiments',
     heading: 'Test Bench', blurb: '' };
   if (!data.filters) data.filters = [];
+  if (tab === 'grid') return renderGrid();
+  if (tab === 'logos') return renderLogos();
   if (tab === 'cases') renderCases();
   else if (tab === 'archive') renderArchive();
   else if (tab === 'work') renderWork();
@@ -402,6 +406,162 @@ function tagSummary(item) {
 }
 
 // one checkbox per filter; the item always shows under "All"
+// How big an item's box is in the Work grid. "auto" (no value stored) lets
+// the layout decide: case studies run large, quick-look pieces small.
+const BOX_SIZES = [
+  ['', 'Auto — let the layout decide'],
+  ['small', 'Small — 1 column'],
+  ['wide', 'Wide — 2 columns, short'],
+  ['tall', 'Tall — 1 column, double height'],
+  ['large', 'Large — 2 columns, double height'],
+  ['full', 'Full — the whole row'],
+];
+function sizeField(item) {
+  const id = 'f' + Math.random().toString(36).slice(2, 8);
+  window[id] = (v) => { if (v) item.size = v; else delete item.size; };
+  return \`<label>Box size on the Work page</label>
+    <select onchange="window['\${id}'](this.value)">\${BOX_SIZES.map(([v, l]) =>
+      \`<option value="\${v}" \${(item.size || '') === v ? 'selected' : ''}>\${l}</option>\`).join('')}</select>
+    <p class="hint">The Work grid is four columns wide. Other boxes flow around whatever you pick here.</p>\`;
+}
+
+// ---------- logo wall: one project that is a page of logos ----------
+// data.logos = { id, enabled, title, intro, tags, size, items: [{ name, mono,
+// color, link }] }. "mono" is the one-colour file (SVG is best: the site
+// tints it to match light or dark mode); "color" is the optional full-colour
+// version shown on hover; "link" is the id of the project a click opens.
+
+function logoWall() {
+  return data.logos && data.logos.enabled !== false && (data.logos.items || []).length ? data.logos : null;
+}
+
+function ensureLogos() {
+  if (!data.logos) data.logos = { id: 'logos', enabled: true, title: 'Logo Design', intro: '', tags: [], items: [] };
+  if (!data.logos.items) data.logos.items = [];
+  data.logos.id = 'logos';
+  return data.logos;
+}
+
+function logoNameFromFile(p) {
+  return p.split('/').pop().replace(/\\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
+}
+
+function renderLogos() {
+  const L = ensureLogos();
+  data.caseStudies.concat(data.archive).forEach(ensureId);
+  const targets = data.caseStudies.map(c => [c.id, 'Case study — ' + c.title])
+    .concat(data.archive.map(a => [a.id, 'Quick look — ' + a.title]));
+  const rows = L.items.map((l, i) => \`
+    <div class="card" style="padding:.9rem">
+      <div class="row" style="border:0;padding:0;margin:0;background:none">
+        <img src="/\${esc(l.mono)}" style="object-fit:contain;background:#fff;padding:4px" onerror="this.style.visibility='hidden'">
+        <div class="grow"><input type="text" value="\${esc(l.name)}" placeholder="Logo name"
+          onchange="data.logos.items[\${i}].name=this.value"></div>
+        <button class="ghost" onclick="move(data.logos.items, \${i}, -1)">↑</button>
+        <button class="ghost" onclick="move(data.logos.items, \${i}, 1)">↓</button>
+        <button class="ghost danger" onclick="if(confirm('Remove this logo from the wall?')){data.logos.items.splice(\${i},1);render()}">✕</button>
+      </div>
+      \${l.placeholder ? '<p class="hint" style="color:var(--accent)">Stand-in cut from an existing project image — replace with the real SVG.</p>' : ''}
+      \${imgField('One-colour file', l.mono, v => { const x = data.logos.items[i]; x.mono = v; delete x.placeholder; }, 'SVG is best. Any single colour works — the site recolours it for light and dark mode.')}
+      \${imgField('Full-colour file (optional)', l.color, v => data.logos.items[i].color = v, 'Shown when the cursor is over the logo. Leave empty and the tile simply inverts on hover.')}
+      <label>Clicking it opens</label>
+      <select onchange="data.logos.items[\${i}].link=this.value">
+        <option value="">Nothing — just show the logo</option>
+        \${targets.map(([id, t]) => \`<option value="\${esc(id)}" \${l.link === id ? 'selected' : ''}>\${esc(t)}</option>\`).join('')}
+      </select>
+    </div>\`).join('');
+
+  $('#view').innerHTML = \`
+    <div class="card">
+      <label class="check" style="margin-top:0">
+        <input type="checkbox" \${L.enabled !== false ? 'checked' : ''} onchange="data.logos.enabled=this.checked; render()">
+        Show the logo wall on the site</label>
+      <label>Project title</label>
+      <input type="text" value="\${esc(L.title || '')}" onchange="data.logos.title=this.value">
+      <label>Intro line</label>
+      <input type="text" value="\${esc(L.intro || '')}" onchange="data.logos.intro=this.value">
+      <label>Filters</label>
+      \${tagChecks(L)}
+      \${sizeField(L)}
+    </div>
+    <h2 class="section">Logos</h2>
+    <p class="hint" style="margin:-.3rem 0 .8rem">Each logo here appears on the logo wall page, in this order. Add an SVG and it shows up — no page of its own needed.</p>
+    \${rows}
+    <p><button class="primary" onclick="openPicker(ps => { ps.forEach(p => data.logos.items.push({ name: logoNameFromFile(p), mono: p, color: '', link: '' })); render(); }, true)">+ Add logos…</button></p>\`;
+}
+
+// ---------- work grid: one order for case studies + archive pieces ----------
+// The Work page shows both kinds in a single grid. data.workOrder lists item
+// ids in display order; the two original lists (and their own order) are left
+// exactly as they were, so the older site layout still builds from them.
+
+function ensureId(item) {
+  if (!item.id) item.id = 'w' + Math.random().toString(36).slice(2, 9);
+  return item.id;
+}
+
+// every item, in grid order: [{ kind: 'case' | 'piece', item }]
+function workItems() {
+  const cases = data.caseStudies.map(item => ({ kind: 'case', item }));
+  const pieces = data.archive.map(item => ({ kind: 'piece', item }));
+  cases.concat(pieces).forEach(x => ensureId(x.item));
+  // pieces a logo links to are reached through the logo wall, not their own box
+  const viaWall = new Set(logoWall() ? data.logos.items.map(l => l.link).filter(Boolean) : []);
+  const shown = pieces.filter(x => !viaWall.has(x.item.id));
+  pieces.length = 0; pieces.push(...shown);
+  const all = cases.concat(pieces);
+  if (logoWall()) all.push({ kind: 'logos', item: data.logos });
+  let list;
+  if (Array.isArray(data.workOrder) && data.workOrder.length) {
+    const byId = new Map(all.map(x => [x.item.id, x]));
+    list = data.workOrder.map(id => byId.get(id)).filter(Boolean);
+    // anything added since the order was last saved goes to the end
+    all.forEach(x => { if (!list.includes(x)) list.push(x); });
+  } else {
+    // first time: a large case study, then a couple of smaller pieces, repeat
+    list = [];
+    const per = cases.length ? Math.max(1, Math.floor(pieces.length / cases.length)) : 0;
+    const p = pieces.slice();
+    if (logoWall()) p.splice(Math.min(2, p.length), 0, { kind: 'logos', item: data.logos });
+    cases.forEach(c => { list.push(c); list.push(...p.splice(0, per)); });
+    list.push(...p);
+  }
+  data.workOrder = list.map(x => x.item.id);
+  return list;
+}
+
+let workDragFrom = null;
+function moveWork(from, to) {
+  const o = data.workOrder;
+  if (to < 0 || to >= o.length || from === to) return;
+  o.splice(to, 0, o.splice(from, 1)[0]);
+  render();
+}
+
+function renderGrid() {
+  const list = workItems();
+  const rows = list.map((x, i) => {
+    const it = x.item;
+    return \`<div class="row" draggable="true" style="\${it.hidden ? 'opacity:.45' : ''}"
+        ondragstart="workDragFrom=\${i}" ondragover="event.preventDefault()" ondrop="event.preventDefault(); moveWork(workDragFrom, \${i})">
+      <span class="handle" title="Drag to reorder">⋮⋮</span>
+      <img src="/\${esc(x.kind === 'logos' ? ((it.items[0] || {}).mono || '') : it.thumb)}" style="\${x.kind === 'logos' ? 'object-fit:contain;background:#fff;padding:4px' : ''}" onerror="this.style.visibility='hidden'">
+      <div class="grow"><strong>\${esc(it.title)}</strong>\${it.hidden ? ' <span style="color:var(--danger);font-size:.75rem">· hidden</span>' : ''}
+        <small>\${x.kind === 'logos' ? 'Logo wall (' + it.items.length + ' logos)' : x.kind === 'case' ? 'Case study' : 'Quick look (' + (it.video ? 'video' : 'stills') + ')'} · \${tagSummary(it)}</small></div>
+      <select style="width:auto" title="Box size"
+        onchange="const it=workItems()[\${i}].item; if(this.value) it.size=this.value; else delete it.size;">\${BOX_SIZES.map(([v, l]) =>
+        \`<option value="\${v}" \${(it.size || '') === v ? 'selected' : ''}>\${l.split(' — ')[0]}</option>\`).join('')}</select>
+      <button class="ghost" title="Move to the top" onclick="moveWork(\${i}, 0)">⤒</button>
+      <button class="ghost" onclick="moveWork(\${i}, \${i - 1})">↑</button>
+      <button class="ghost" onclick="moveWork(\${i}, \${i + 1})">↓</button>
+    </div>\`;
+  }).join('');
+  $('#view').innerHTML =
+    '<p class="hint" style="margin:0 0 1rem">Every project on the Work page, in the order the boxes appear. Drag ⋮⋮ (or use the arrows) to reorder, and pick a size for any box. ' +
+    'On Auto, case studies are Large, quick looks are Small and the logo wall is Large. Pieces that a logo on the wall links to are opened from the wall, so they do not get a box of their own here. The grid is four columns wide and closes gaps by letting a smaller box slip up into an empty space, so a small box can occasionally land just ahead of a big one that comes before it in this list. ' +
+    'To edit a project itself, use the Case Studies or Archives tab.</p>' + rows;
+}
+
 function tagChecks(item) {
   if (!data.filters.length)
     return '<p class="hint">No filters yet — add them in the Work Page &amp; Filters tab.</p>';
@@ -644,6 +804,7 @@ function renderCaseForm() {
       <input type="text" value="\${esc(p.slug)}" onchange="data.caseStudies[\${editing}].slug=slugify(this.value)">
       <label>Filters</label>
       \${tagChecks(p)}
+      \${sizeField(p)}
       <label>Client</label>
       <input type="text" value="\${esc(p.client)}" onchange="data.caseStudies[\${editing}].client=this.value">
       <label>Discipline</label>
@@ -732,6 +893,7 @@ function renderArchiveForm() {
       <input type="text" value="\${esc(a.title)}" onchange="data.archive[\${editingArchive}].title=this.value">
       <label>Filters</label>
       \${tagChecks(a)}
+      \${sizeField(a)}
       \${imgField('Thumbnail', a.thumb, v => data.archive[editingArchive].thumb = v)}
       <label>YouTube video ID <span style="text-transform:none;letter-spacing:0">(leave empty for image-only pieces)</span></label>
       <input type="text" value="\${esc(a.video || '')}"

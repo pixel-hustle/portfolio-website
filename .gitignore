@@ -1,0 +1,4 @@
+# local design mockups — not part of the published site
+mockups/
+mockup-*.html
+.DS_Store

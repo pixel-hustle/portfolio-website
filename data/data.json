@@ -4,7 +4,7 @@
     "title": "Jared Hanline — Art Director & Motion Designer",
     "role": "Art Director & Motion Designer",
     "headline": "Creative Director Brand & Motion",
-    "tagline": "Charlotte-based creative director with nearly 20 years leading cross-discipline teams — building brands, motion systems, and the AI-era workflows that power them.",
+    "tagline": "Charlotte-based creative/art director with nearly 20 years leading cross-discipline teams — building brands, motion systems, and the AI-era workflows that power them.",
     "email": "jhanline@gmail.com",
     "emailSubject": "Work Inquiry",
     "reelVideo": "RRXaC1RTvcg",
@@ -581,7 +581,8 @@
       "images": [
         "assets/img/archive-outpost-img1.webp",
         "assets/img/archive-outpost-img2.webp"
-      ]
+      ],
+      "id": "piece-outpost-strategies-logo"
     },
     {
       "title": "INSP New Year ID",
@@ -601,7 +602,8 @@
         "assets/img/archive-aw-img1.webp",
         "assets/img/archive-aw-img2.webp",
         "assets/img/archive-aw-img3.webp"
-      ]
+      ],
+      "id": "piece-a-w-interiors-logo"
     },
     {
       "title": "INSP Curtain Raiser",
@@ -621,7 +623,8 @@
         "assets/img/archive-xii-img1.webp",
         "assets/img/archive-xii-img2.webp",
         "assets/img/archive-xii-img3.webp"
-      ]
+      ],
+      "id": "piece-twelve-logo"
     },
     {
       "title": "Walk By Faith Intro",
@@ -640,7 +643,8 @@
       "images": [
         "assets/img/archive-18x-img1.webp",
         "assets/img/archive-18x-img2.webp"
-      ]
+      ],
+      "id": "piece-18x-consulting-logo-package"
     },
     {
       "title": "On Trajectory Illustrations & Loaders",
@@ -675,7 +679,8 @@
         "assets/img/archive-shadow-img2.webp",
         "assets/img/archive-shadow-img3.webp",
         "assets/img/archive-shadow-img4.webp"
-      ]
+      ],
+      "id": "piece-shadow-creek-apiary-brand"
     },
     {
       "title": "INSP Halloween ID",
@@ -694,7 +699,8 @@
       "images": [
         "assets/img/archive-ic-img1.webp",
         "assets/img/archive-ic-img2.webp"
-      ]
+      ],
+      "id": "piece-immanuel-church-logo"
     },
     {
       "title": "Matchstick Creative Logo",
@@ -704,7 +710,8 @@
       "thumb": "assets/img/archive-matchstick-tn.webp",
       "images": [
         "assets/img/archive-matchstick-img2.webp"
-      ]
+      ],
+      "id": "piece-matchstick-creative-logo"
     },
     {
       "title": "Genmill Logo Suite",
@@ -715,7 +722,8 @@
       "images": [
         "assets/img/archive-genmill-img2.webp",
         "assets/img/archive-genmill-img3.webp"
-      ]
+      ],
+      "id": "piece-genmill-logo-suite"
     },
     {
       "title": "Endure Short Film",
@@ -842,6 +850,73 @@
           "type": "web",
           "url": ""
         }
+      }
+    ]
+  },
+  "logos": {
+    "id": "logos",
+    "enabled": true,
+    "title": "Logo Design",
+    "intro": "Marks and wordmarks, big clients and small. Hover a logo for its colors, click it for the full project.",
+    "tags": [
+      "design"
+    ],
+    "items": [
+      {
+        "name": "Immanuel Church",
+        "mono": "assets/img/logo-placeholder-immanuel.png",
+        "color": "",
+        "link": "piece-immanuel-church-logo",
+        "placeholder": true
+      },
+      {
+        "name": "18X Consulting",
+        "mono": "assets/img/logo-placeholder-18x.png",
+        "color": "",
+        "link": "piece-18x-consulting-logo-package",
+        "placeholder": true
+      },
+      {
+        "name": "Shadow Creek Apiary",
+        "mono": "assets/img/logo-placeholder-shadowcreek.png",
+        "color": "",
+        "link": "piece-shadow-creek-apiary-brand",
+        "placeholder": true
+      },
+      {
+        "name": "A.W. Interiors",
+        "mono": "assets/img/logo-placeholder-aw.png",
+        "color": "",
+        "link": "piece-a-w-interiors-logo",
+        "placeholder": true
+      },
+      {
+        "name": "Twelve",
+        "mono": "assets/img/logo-placeholder-twelve.png",
+        "color": "",
+        "link": "piece-twelve-logo",
+        "placeholder": true
+      },
+      {
+        "name": "Outpost Strategies",
+        "mono": "assets/img/logo-placeholder-outpost.png",
+        "color": "",
+        "link": "piece-outpost-strategies-logo",
+        "placeholder": true
+      },
+      {
+        "name": "Matchstick Creative",
+        "mono": "assets/img/logo-placeholder-matchstick.png",
+        "color": "",
+        "link": "piece-matchstick-creative-logo",
+        "placeholder": true
+      },
+      {
+        "name": "Genmill Real Estate",
+        "mono": "assets/img/logo-placeholder-genmill.png",
+        "color": "assets/img/logo-placeholder-genmill-color.png",
+        "link": "piece-genmill-logo-suite",
+        "placeholder": true
       }
     ]
   }

@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <link rel="canonical" href="index.html?filter=design">
 <meta http-equiv="refresh" content="0; url=index.html?filter=design">
-<script>location.replace("index.html?filter=design" + location.hash)</script>
+<script>location.replace("index.html?filter=design" + ("index.html?filter=design".indexOf("?") < 0 && "index.html?filter=design".indexOf("#") < 0 ? location.search + location.hash : ""))</script>
 </head>
 <body><a href="index.html?filter=design">Continue</a></body>
 </html>
