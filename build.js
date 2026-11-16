@@ -78,9 +78,11 @@ const viaWall = new Set(logos ? logos.items.map((l) => l.link).filter(Boolean) :
 const gridArch = arch.filter((a) => !viaWall.has(a.id));
 
 // a mark is drawn as a mask, so one file takes the page's ink colour in light
-// and dark alike (SVG, or any image with transparency)
+// and dark alike (SVG, or any image with transparency). The image is set inline rather than
+// through a CSS variable: a url() inside a variable resolves from the
+// stylesheet's folder, which would point at the wrong place.
 const mark = (l, withColor) =>
-  `<span class="mark" style="--m:url('${esc(l.mono)}')" role="img" aria-label="${esc(l.name)}"></span>${
+  `<span class="mark" style="-webkit-mask-image:url('${esc(l.mono)}');mask-image:url('${esc(l.mono)}')" role="img" aria-label="${esc(l.name)}"></span>${
     withColor && l.color ? `<img class="full" src="${esc(l.color)}" alt="" loading="lazy">` : ""
   }`;
 
