@@ -114,13 +114,26 @@ if (dlg) {
   dlg.addEventListener("close", () => { stack.innerHTML = ""; });
 }
 
-// ---- scroll reveals ----
-if ("IntersectionObserver" in window) {
-  const io = new IntersectionObserver(
-    (es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
-    { rootMargin: "0px 0px -6% 0px" }
-  );
-  document.querySelectorAll(".rise").forEach((el) => io.observe(el));
-} else {
-  document.querySelectorAll(".rise").forEach((el) => el.classList.add("in"));
+// ---- entrances: boxes rise in on load, then as they scroll into view ----
+{
+  const boxes = [...document.querySelectorAll(".rise, .box, .work .card, figure.media, .logo, .label, .bench, .bar")]
+    .filter((el) => !el.matches(".bench .box"));
+  const show = (el, delay) => {
+    el.style.animationDelay = `${delay}ms`;
+    el.classList.add("in");
+    // once settled, drop the animation so hover and filter transforms work normally
+    setTimeout(() => { el.classList.add("done"); el.style.animationDelay = ""; }, delay + 950);
+  };
+  if (CALM || !("IntersectionObserver" in window)) {
+    boxes.forEach((el) => el.classList.add("in", "done"));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      // boxes arriving together cascade top-to-bottom, left-to-right
+      entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
+        .forEach((e, n) => { io.unobserve(e.target); show(e.target, Math.min(n, 9) * 70); });
+    }, { rootMargin: "0px 0px -4% 0px" });
+    boxes.forEach((el) => io.observe(el));
+  }
 }

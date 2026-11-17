@@ -214,10 +214,7 @@ button.logo:hover,a.logo:hover{transform:translateY(-3px)}
 h1.big,.foot h2,.title h1,.wallhead h1,.door strong,.tri h3,.label h2,.fact strong,.pn strong{font-family:var(--display);font-weight:var(--hw);letter-spacing:var(--ht);text-transform:var(--hc)}
 .door strong,.tri h3,.label h2,.fact strong,.pn strong{letter-spacing:calc(var(--ht)*.7);font-size-adjust:none}
 /* entrance */
-@media (prefers-reduced-motion:no-preference){
-  .js .rise{opacity:0;transform:translateY(22px) scale(.985);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
-  .js .rise.in{opacity:1;transform:none}
-}
+
 @media(max-width:900px){
   .state,.side,.tri,.title,.facts,.credits,.pn,.m6{grid-column:1/-1}
   .card{grid-column:1/-1!important}.card.piece{grid-column:span 6!important}
@@ -286,3 +283,26 @@ figure.media figcaption{padding:10px 14px;background:var(--card);color:var(--mut
   .bar{padding:5px 5px 5px 12px}.bar b{font-size:13px}
   .pills{gap:2px}.pill{padding:7px 9px;font-size:12px}
 }
+
+/* ---------- top block at in-between widths (tablets, narrow windows) ----------
+   The reel lines up with the statement box — same top, same bottom — and
+   takes half the row; the filters get a full row of their own underneath. */
+@media(min-width:901px) and (max-width:1240px){
+  .state{grid-column:1/7;flex-direction:column;align-items:flex-start;justify-content:space-between;flex-wrap:nowrap}
+  .side.solo{grid-column:7/13;grid-row:1}
+  .label.filters{grid-column:1/-1}
+  .state.full{grid-column:1/-1}
+}
+
+/* ---------- entrances ----------
+   Every box starts slightly low, small and transparent, then settles as it
+   enters view: on load that's the first screenful, staggered; after that,
+   whatever scrolls in. site.js adds .in (with a per-box delay) and then
+   .done, which hands the transform back to hovers and filter animations. */
+@media (prefers-reduced-motion:no-preference){
+  .js :is(.rise,.box,.work .card,figure.media,.logo,.label,.bench,.bar):not(.in):not(.bench .box){opacity:0}
+  .js .in:not(.done){animation:rise-in .85s cubic-bezier(.16,1,.3,1) both}
+  .js .bar.in:not(.done){animation-name:drop-in}
+}
+@keyframes rise-in{from{opacity:0;transform:translateY(34px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes drop-in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
